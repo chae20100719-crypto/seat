@@ -138,7 +138,7 @@ input[type=number]{width:60px}
 .rps .cap{font-size:1.6rem;font-weight:700;margin-top:6px;min-height:2.2rem}
 .rps .row{justify-content:center;margin-top:14px}
 .pop{animation:pop .45s ease-out}
-.sus{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:20;background:#1b1b24;color:#fff;border-radius:999px;padding:12px 26px 14px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.4);min-width:260px}
+.sus{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:20;background:#1b1b24;color:#fff;border-radius:999px;padding:10px 26px 12px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.4);min-width:260px}
 .sus[hidden]{display:none}
 .sus b{display:block;font-size:1.4rem;animation:shake .18s infinite}
 .sus .track{height:5px;background:#444;border-radius:3px;margin-top:8px;overflow:hidden}
@@ -306,7 +306,7 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
   <div class="row noprint"><button class="btn ghost" data-close>닫기</button></div>
 </div></div>
 
-<div class="sus" id="sus" hidden><b>두구두구두구…</b><div class="track"><div class="bar" id="susBar"></div></div></div>
+<div class="sus" id="sus" hidden><div class="track"><div class="bar" id="susBar"></div></div></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
@@ -474,13 +474,18 @@ function tone(f0, f1, t0, dur, type, vol) {
   o.connect(g); g.connect(AC.destination); o.start(t0); o.stop(t0 + dur + 0.05);
 }
 function playTension(dur) {
+  /* 깔끔한 긴장감: 일정하게 빠른 박자 + 한 음씩 올라가는 맑은 소리 + 부드러운 상승음 */
   if (!soundOn() || !audio()) return;
-  var t = AC.currentTime + 0.05, tt = 0, gap = 0.75;
-  while (tt < dur) { tone(95, 45, t + tt, 0.14, "sine", 0.6); tone(80, 40, t + tt + 0.17, 0.12, "sine", 0.4); tt += gap; gap = Math.max(0.3, gap * 0.86); }
-  var o = AC.createOscillator(), g = AC.createGain();
-  o.type = "sawtooth"; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(440, t + dur);
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.1, t + dur); g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.05);
-  o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur + 0.1);
+  var t = AC.currentTime + 0.05, f = function (m) { return 440 * Math.pow(2, (m - 69) / 12); };
+  var scale = [0, 3, 5, 7, 10], tt = 0, step = 0.11, i = 0;           /* 마이너 펜타토닉: 조용히 불안한 음 */
+  while (tt < dur - 0.45) {
+    var m = 57 + scale[i % 5] + 12 * Math.min(2, Math.floor(i / 10));
+    tone(f(m), f(m), t + tt, 0.09, "triangle", 0.11);                 /* 맑은 음이 계단처럼 올라가요 */
+    if (i % 4 === 0) tone(90, 50, t + tt, 0.12, "sine", 0.35);       /* 부드러운 쿵 */
+    tt += step; i++;
+  }
+  var e = t + dur - 0.5;
+  tone(300, 1200, e, 0.45, "sine", 0.12);                              /* 마지막 부드럽게 올라가기 */
 }
 function playReveal() {
   if (!soundOn() || !audio()) return;
@@ -491,7 +496,7 @@ function suspense() {
   if (susBusy || busy) return;
   if (getNums().length > allSeats().length) { say("자리가 부족해요. 학급 정보 입력에서 줄 수나 칸 수를 늘려 주세요."); return; }
   susBusy = true;
-  var DUR = 3600, el = document.getElementById("sus"), bar = document.getElementById("susBar");
+  var DUR = 2500, el = document.getElementById("sus"), bar = document.getElementById("susBar");
   el.hidden = false; document.body.classList.add("tense");
   bar.style.transition = "none"; bar.style.width = "0"; void bar.offsetWidth;
   bar.style.transition = "width " + DUR + "ms linear"; bar.style.width = "100%";
@@ -512,6 +517,17 @@ var HANDS = {
 };
 var rBig = document.getElementById("rBig"), rCap = document.getElementById("rCap"), rBtns = document.getElementById("rBtns");
 function popIn(el) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
+function rpsBeep(n) {   /* 1, 2, 3 숫자마다 점점 높아지는 "뿅" 소리 */
+  if (!soundOn() || !audio()) return;
+  var t = AC.currentTime + 0.01, f = [440, 523, 659][n] || 659;
+  tone(f, f * 1.5, t, 0.16, "triangle", 0.3);
+}
+function rpsReveal() {   /* 손이 나올 때 "짠!" */
+  if (!soundOn() || !audio()) return;
+  var t = AC.currentTime + 0.01;
+  tone(200, 900, t, 0.12, "square", 0.08);
+  [784, 988, 1319].forEach(function (f, i) { tone(f, f, t + 0.1 + i * 0.07, 0.3, "triangle", 0.22); });
+}
 function playRps() {
   if (busy) return;
   busy = true;
@@ -522,11 +538,11 @@ function playRps() {
   (function step() {
     if (i < steps.length) {
       rBig.innerHTML = steps[i][0]; rCap.textContent = steps[i][1];
-      popIn(rBig); i++;
+      rpsBeep(i); popIn(rBig); i++;
       setTimeout(step, 450);
     } else {
       var keys = ["가위", "바위", "보"], pick = keys[Math.floor(Math.random() * 3)];
-      rBig.innerHTML = HANDS[pick]; popIn(rBig);
+      rBig.innerHTML = HANDS[pick]; popIn(rBig); rpsReveal();
       rCap.textContent = "나는 " + pick + "를 냈어요!";
       rBtns.style.visibility = "visible";
       busy = false;
