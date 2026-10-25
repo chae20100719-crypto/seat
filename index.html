@@ -229,7 +229,7 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
       <label><input type="text" id="nClass" placeholder="예: 3" style="width:70px"> 반</label>
     </div>
     <label class="fl">학생 이름 (한 줄에 한 명)
-      <textarea id="nNames" placeholder="1 김지효&#10;2 박다인&#10;3 유한서&#10;..."></textarea>
+      <textarea id="nNames" placeholder="1 김철수&#10;2 김영희&#10;3 이민수&#10;..."></textarea>
     </label>
     <p class="hint">"번호 이름" 모양으로 적어요. 번호 없이 이름만 적으면 학생 번호 순서대로 붙어요.</p>
     <div class="row">
@@ -528,6 +528,14 @@ function rpsReveal() {   /* 손이 나올 때 "짠!" */
   tone(200, 900, t, 0.12, "square", 0.08);
   [784, 988, 1319].forEach(function (f, i) { tone(f, f, t + 0.1 + i * 0.07, 0.3, "triangle", 0.22); });
 }
+var rpsBag = [];
+function nextRps() {   /* 가위·바위·보를 섞어서 하나씩 꺼내요. 세 번 안에 셋 다 한 번씩 나와요. */
+  if (!rpsBag.length) {
+    rpsBag = ["가위", "바위", "보"];
+    for (var i = rpsBag.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = rpsBag[i]; rpsBag[i] = rpsBag[j]; rpsBag[j] = t; }
+  }
+  return rpsBag.pop();
+}
 function playRps() {
   if (busy) return;
   busy = true;
@@ -541,7 +549,7 @@ function playRps() {
       rpsBeep(i); popIn(rBig); i++;
       setTimeout(step, 450);
     } else {
-      var keys = ["가위", "바위", "보"], pick = keys[Math.floor(Math.random() * 3)];
+      var pick = nextRps();
       rBig.innerHTML = HANDS[pick]; popIn(rBig); rpsReveal();
       rCap.textContent = "나는 " + pick + "를 냈어요!";
       rBtns.style.visibility = "visible";
