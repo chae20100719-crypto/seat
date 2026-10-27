@@ -103,13 +103,14 @@ main{margin:0 auto;padding:10px 12px}
 .gh{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:var(--gap)}
 .gh div{height:var(--hh);font-size:clamp(1.1rem,1.7vw,1.6rem)}
 .gs{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap) 4px}
-.seat{height:var(--sh);background:var(--desk);color:var(--ink);border-radius:8px;box-shadow:0 4px 0 var(--desk-edge),inset 0 0 0 1px rgba(255,255,255,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:700;font-size:clamp(1.1rem,min(2.8vw,calc(var(--sh) * .36)),2.8rem);cursor:pointer;padding:2px;transition:transform .1s}
+.seat{height:var(--sh);background:var(--desk);color:var(--ink);border-radius:8px;box-shadow:0 4px 0 var(--desk-edge),inset 0 0 0 1px rgba(255,255,255,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:700;font-size:calc(clamp(1rem,min(2.2vw,calc(var(--sh) * .3)),2.2rem) * var(--sf,1));cursor:pointer;padding:2px;transition:transform .1s}
 .seat:hover{transform:translateY(-2px)}
 .seat.front{background:var(--front);box-shadow:0 4px 0 var(--front-edge),inset 0 0 0 1px rgba(255,255,255,.3)}
 .seat.fixed{background:var(--fix);box-shadow:0 4px 0 var(--fix-edge),inset 0 0 0 1px rgba(255,255,255,.3)}
 .seat.empty{background:transparent;box-shadow:none;border:2px dashed var(--line);color:var(--sub);font-weight:500;font-size:clamp(.8rem,1.3vw,1.1rem)}
+.seat .nm{font-size:.5em;font-weight:500;line-height:1.1;margin-top:2px}
 .seat .role{font-size:.5em;font-weight:500;opacity:.78;line-height:1.1;margin-top:2px}
-body.names .seat{font-size:clamp(1rem,min(2vw,calc(var(--sh) * .3)),2.2rem)}
+body.names .seat{font-size:calc(clamp(.95rem,min(2vw,calc(var(--sh) * .28)),2rem) * var(--sf,1))}
 .hint{color:var(--sub);font-size:.85rem;margin:4px 0}
 .board>.hint{margin:12px 4px 0;text-align:center}
 
@@ -132,10 +133,10 @@ input[type=number]{width:60px}
 .fl input{display:block;width:100%;margin-top:4px}
 .modal .row label{white-space:nowrap}
 .err{color:#c4372f;font-size:.9rem;min-height:1.3em;margin:4px 0}
-.rps{text-align:center;padding:24px 16px}
-.rps .big{font-size:7rem;font-weight:800;line-height:1;color:var(--accent);min-height:7.5rem;display:flex;align-items:center;justify-content:center}
-.rps .big img{width:min(220px,40vh);height:min(220px,40vh);border-radius:24px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.18)}
-.rps .cap{font-size:1.6rem;font-weight:700;margin-top:6px;min-height:2.2rem}
+.rps{text-align:center;padding:28px 20px;max-width:min(97vw,1100px);width:100%;max-height:98vh}
+.rps .big{font-size:min(22rem,42vh);font-weight:800;line-height:1;color:var(--accent);min-height:min(640px,64vh);display:flex;align-items:center;justify-content:center}
+.rps .big img{width:min(640px,64vh,88vw);height:min(640px,64vh,88vw);border-radius:24px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.rps .cap{font-size:clamp(1.4rem,min(6vh,7vw),3.6rem);font-weight:700;margin-top:10px;min-height:3.4rem}
 .rps .row{justify-content:center;margin-top:14px}
 .pop{animation:pop .45s ease-out}
 .sus{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:20;background:#1b1b24;color:#fff;border-radius:999px;padding:10px 26px 12px;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.4);min-width:260px}
@@ -157,7 +158,7 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
 .sgrp.b{justify-content:flex-end}
 .srow{display:flex}
 .sc{width:clamp(60px,9.6vw,120px);height:clamp(32px,4.8vw,60px);border:1.5px solid #000;margin:-.75px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:400;font-size:clamp(.8rem,1.5vw,1.2rem);background:#fff}
-.sc.e{border-color:transparent}
+.sc.e{border-color:transparent;background:transparent}
 .sc.hl{background:#fff6b0}
 .sc .rl{font-size:.62em;font-weight:400;line-height:1.1;margin-top:2px}
 .spod{width:clamp(120px,19.2vw,240px);border:1.5px solid #000;padding:clamp(6px,1.4vw,14px) 0;font-weight:400;margin:clamp(14px,2.4vw,28px) auto 0}
@@ -274,9 +275,10 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
     <label><input type="checkbox" id="useNames"> 번호 대신 이름으로</label>
   </div>
   <div id="sheet"></div>
-  <p class="hint noprint" id="pmsg">자리배치도를 그림 파일(PNG)로 저장할 수 있어요.</p>
+  <p class="hint noprint" id="pmsg">자리배치도를 그림 파일(PNG)이나 워드 파일(.docx)로 저장할 수 있어요.</p>
   <div class="row noprint">
     <button class="btn" id="pSave" style="font-size:1.05rem;padding:11px 22px">이미지로 저장</button>
+    <button class="btn" id="pDocx" style="font-size:1.05rem;padding:11px 22px">워드 파일로 저장</button>
   </div>
 
   <section class="sec noprint" id="cloudBox" style="display:none">
@@ -400,6 +402,9 @@ function render() {
     box.appendChild(grp);
   }
   document.getElementById("cnt").textContent = "학생 " + getNums().length + "명 / 자리 " + allSeats().length + "개";
+  /* 모든 자리 글자 크기를 똑같이: 가장 긴 글자에 맞춰 한 번에 정해요 */
+  var longest = 0; document.querySelectorAll(".seat:not(.empty) > div").forEach(function (d) { longest = Math.max(longest, d.textContent.length); });
+  document.documentElement.style.setProperty("--sf", longest > 9 ? ".78" : longest > 7 ? ".88" : "1");
   fit();
 }
 /* 화면 높이에 맞춰 책상 크기를 키워서 여백 없이 꽉 채움 */
@@ -517,6 +522,23 @@ var HANDS = {
 };
 var rBig = document.getElementById("rBig"), rCap = document.getElementById("rCap"), rBtns = document.getElementById("rBtns");
 function popIn(el) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
+function rpsSay(text, n) {   /* 기기의 한국어 목소리로 "가위", "바위", "보!" 하고 외쳐요 */
+  if (!soundOn()) return false;
+  try {
+    var ss = window.speechSynthesis; if (!ss || typeof SpeechSynthesisUtterance === "undefined") return false;
+    ss.cancel();
+    var u = new SpeechSynthesisUtterance(text); u.lang = "ko-KR"; u.volume = 1;
+    /* 가위(보통) → 바위(조금 높게) → 보!(제일 높고 힘차게): 우리가 가위바위보 할 때의 음 */
+    u.pitch = [1.0, 1.25, 1.6][n] || 1.2; u.rate = [1.5, 1.5, 1.2][n] || 1.4;
+    var vs = ss.getVoices ? ss.getVoices() : [];
+    for (var i = 0; i < vs.length; i++) if ((vs[i].lang || "").toLowerCase().replace("_", "-").indexOf("ko") === 0) { u.voice = vs[i]; break; }
+    ss.speak(u); return true;
+  } catch (e) { return false; }
+}
+function rpsTick() {   /* 박자를 알려주는 짧은 "딱" */
+  if (!soundOn() || !audio()) return;
+  tone(1800, 1200, AC.currentTime + 0.005, 0.05, "square", 0.05);
+}
 function rpsBeep(n) {   /* 1, 2, 3 숫자마다 점점 높아지는 "뿅" 소리 */
   if (!soundOn() || !audio()) return;
   var t = AC.currentTime + 0.01, f = [440, 523, 659][n] || 659;
@@ -542,12 +564,14 @@ function playRps() {
   document.getElementById("ovRps").hidden = false;
   rBtns.style.visibility = "hidden";
   var steps = [["1", "가위"], ["2", "바위"], ["3", "보!"]], i = 0;
+  var BEAT = 560, t0 = performance.now();
   rCap.textContent = "";
   (function step() {
     if (i < steps.length) {
       rBig.innerHTML = steps[i][0]; rCap.textContent = steps[i][1];
-      rpsBeep(i); popIn(rBig); i++;
-      setTimeout(step, 450);
+      if (!rpsSay(["가위", "바위", "보!"][i], i)) rpsBeep(i); else rpsTick();
+      popIn(rBig); i++;
+      setTimeout(step, Math.max(0, t0 + i * BEAT - performance.now()));   /* 박자가 밀리지 않게 시계를 보고 맞춰요 */
     } else {
       var pick = nextRps();
       rBig.innerHTML = HANDS[pick]; popIn(rBig); rpsReveal();
@@ -579,7 +603,8 @@ function fillCell(el, key) {
   el.textContent = "";
   if (empty[key]) { el.textContent = "빈자리"; return; }
   var n = result[key]; if (!n) return;
-  var a = document.createElement("div"); a.textContent = showNames ? (nameMap()[n] || n) : n; el.appendChild(a);
+  var nm = nameMap()[n];
+  var a = document.createElement("div"); a.textContent = showNames ? (nm || n) : (nm ? n + ". " + nm : n); el.appendChild(a);   /* 번호 옆에 이름도 같은 크기로 */
 }
 
 /* ---- 인쇄 · 공유용 자리배치도 ---- */
@@ -593,7 +618,7 @@ function sheetModel() {
       for (var c = 0; c < 2; c++) {
         var key = g + "-" + r + "-" + c;
         if (empty[key]) cells.push({ blank: true });
-        else { var num = result[key]; cells.push(num ? { name: useN ? (nm[num] || num) : num, role: roleOf(num) } : { name: "" }); }
+        else { var num = result[key]; cells.push(num ? { name: useN ? (nm[num] ? num + ". " + nm[num] : num) : num, role: roleOf(num) } : { name: "" }); }
       }
       rs.push(cells);
     }
@@ -601,8 +626,13 @@ function sheetModel() {
   });
   return { title: "☺  " + grade + "학년  " + (cls ? cls : "○") + "반 자리배치표 ☺", groups: groups, file: grade + "학년 " + (cls || "") + "반 자리배치표.png" };
 }
+/* 교탁이 아래일 때는 교실을 180° 돌린 모양(왼쪽↔오른쪽, 앞↔뒤 모두 반대)으로 그려요. 화면과 같은 자리예요. */
+function flip180(m) {
+  return { title: m.title, file: m.file, groups: m.groups.slice().reverse().map(function (rs) { return rs.map(function (cells) { return cells.slice().reverse(); }); }) };
+}
 function buildSheet() {
   var m = sheetModel(), bottom = document.getElementById("podPos").value === "bottom", sh = document.getElementById("sheet");
+  if (bottom) m = flip180(m);
   sh.innerHTML = "";
   var h = document.createElement("h2"); h.className = "st"; h.textContent = m.title; sh.appendChild(h);
   function pod() { var d = document.createElement("div"); d.className = "spod" + (bottom ? "" : " t"); d.textContent = "교탁"; return d; }
@@ -630,16 +660,17 @@ function buildSheet() {
 }
 function sheetCanvas() {
   var m = sheetModel(), bottom = document.getElementById("podPos").value === "bottom";
+  if (bottom) m = flip180(m);
   /* 샘플 한글 파일 치수(mm)를 그대로 환산: 칸 34.6x17.3, 분단 사이 7.7, 교탁 칸 2개 너비 */
-  var U = 8, cw = Math.round(34.6 * U), ch = Math.round(17.3 * U), gg = Math.round(7.7 * U), mx = 14 * U, G = m.groups.length;
+  var U = 6, cw = Math.round(34.6 * U), ch = Math.round(17.3 * U), gg = Math.round(7.7 * U), mx = 7 * U, G = m.groups.length;
   var maxR = Math.max.apply(null, m.groups.map(function (g) { return g.length; }));
-  var W = mx * 2 + G * 2 * cw + (G - 1) * gg, titleH = 34 * U, podGap = 11 * U, podH = ch, H = titleH + maxR * ch + podGap + podH + 14 * U;
+  var W = mx * 2 + G * 2 * cw + (G - 1) * gg, titleH = 40 * U, podGap = 9 * U, podH = ch, H = titleH + maxR * ch + podGap + podH + 6 * U;
   var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
   var pt = U * 25.4 / 72, F = '"한컴 윤체 L","Noto Serif KR","Batang","Nanum Myeongjo",serif', WT = "300 ";
   var x = cv.getContext("2d");
   x.fillStyle = "#fff"; x.fillRect(0, 0, W, H);
-  x.fillStyle = "#000"; x.strokeStyle = "#000"; x.lineWidth = 3; x.lineJoin = "miter"; x.textAlign = "center"; x.textBaseline = "middle";
-  x.font = WT + Math.round(27 * pt) + "px " + F; x.fillText(m.title, W / 2, 15 * U);
+  x.fillStyle = "#000"; x.strokeStyle = "#000"; x.lineWidth = 2; x.lineJoin = "miter"; x.textAlign = "center"; x.textBaseline = "middle";
+  x.font = WT + Math.round(22 * pt) + "px " + F; x.fillText(m.title, W / 2, 11 * U);
   var podTop = titleH - 10 * U, gridTop = titleH;
   if (!bottom) gridTop = podTop + podH + podGap;
   var gridBottom = gridTop + maxR * ch;
@@ -652,16 +683,100 @@ function sheetCanvas() {
         var cx = x0 + ci * cw;
         if (c.role) { x.fillStyle = "#fff6b0"; x.fillRect(cx, y, cw, ch); x.fillStyle = "#000"; }
         x.strokeRect(cx, y, cw, ch);
-        var size = Math.round(20 * pt); x.font = WT + size + "px " + F;
-        while (x.measureText(c.name).width > cw - 16 && size > 14) { size -= 2; x.font = WT + size + "px " + F; }
-        x.fillText(c.name, cx + cw / 2, y + (c.role ? ch / 2 - 14 : ch / 2));
-        if (c.role) { x.font = WT + Math.round(12 * pt) + "px " + F; x.fillText(c.role, cx + cw / 2, y + ch - 28); }
+        var size = Math.round(16 * pt); x.font = WT + size + "px " + F;
+        while (x.measureText(c.name).width > cw - 2 * U && size > 10) { size -= 2; x.font = WT + size + "px " + F; }
+        x.fillText(c.name, cx + cw / 2, y + (c.role ? ch / 2 - 1.6 * U : ch / 2));
+        if (c.role) { x.font = WT + Math.round(10 * pt) + "px " + F; x.fillText(c.role, cx + cw / 2, y + ch - 3.3 * U); }
       });
     });
   });
   var py = bottom ? gridBottom + podGap : podTop;
-  x.strokeRect(W / 2 - cw, py, 2 * cw, podH); x.font = WT + Math.round(22 * pt) + "px " + F; x.fillText("교탁", W / 2, py + podH / 2);
+  x.strokeRect(W / 2 - cw, py, 2 * cw, podH); x.font = WT + Math.round(16 * pt) + "px " + F; x.fillText("교탁", W / 2, py + podH / 2);
   return { cv: cv, name: m.file };
+}
+
+/* ---- 워드(.docx) 파일로 저장: 표로 된 자리표를 직접 만들어요 ---- */
+var CRC_T = null;
+function crc32(u8) {
+  if (!CRC_T) { CRC_T = []; for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; CRC_T[n] = c >>> 0; } }
+  var c2 = 0xFFFFFFFF; for (var i = 0; i < u8.length; i++) c2 = CRC_T[(c2 ^ u8[i]) & 255] ^ (c2 >>> 8); return (c2 ^ 0xFFFFFFFF) >>> 0;
+}
+function zipStore(files) {   /* files: [[이름, 글자]] — 압축 없이 묶어요 */
+  var enc = new TextEncoder(), chunks = [], central = [], off = 0;
+  function u16(v) { return [v & 255, (v >>> 8) & 255]; }
+  function u32(v) { return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; }
+  files.forEach(function (f) {
+    var nm = enc.encode(f[0]), data = enc.encode(f[1]), crc = crc32(data);
+    var lh = [0x50, 0x4b, 3, 4].concat(u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(data.length), u32(data.length), u16(nm.length), u16(0));
+    chunks.push(new Uint8Array(lh), nm, data);
+    central.push([0x50, 0x4b, 1, 2].concat(u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(data.length), u32(data.length), u16(nm.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(off)), Array.prototype.slice.call(nm));
+    off += lh.length + nm.length + data.length;
+  });
+  var cd = []; central.forEach(function (c) { cd = cd.concat(c); });
+  var end = [0x50, 0x4b, 5, 6].concat(u16(0), u16(0), u16(files.length), u16(files.length), u32(cd.length), u32(off), u16(0));
+  chunks.push(new Uint8Array(cd), new Uint8Array(end));
+  return new Blob(chunks, { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+}
+function xe(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function sheetDocx() {
+  var m = sheetModel(), bottom = document.getElementById("podPos").value === "bottom";
+  if (bottom) m = flip180(m);
+  var G = m.groups.length, maxR = Math.max.apply(null, m.groups.map(function (g) { return g.length; }));
+  var avail = 15600, gapW = Math.round(avail * 0.03), seatW = Math.floor((avail - (G - 1) * gapW) / (2 * G)), tot = G * 2 * seatW + (G - 1) * gapW;
+  if (tot > avail) { var k = avail / tot; seatW = Math.floor(seatW * k); gapW = Math.floor(gapW * k); tot = G * 2 * seatW + (G - 1) * gapW; }
+  var FONT = "한컴 윤체 L", rf = '<w:rFonts w:ascii="' + FONT + '" w:hAnsi="' + FONT + '" w:eastAsia="' + FONT + '" w:cs="' + FONT + '"/>';
+  var B = '<w:tcBorders>' + ["top", "left", "bottom", "right"].map(function (s) { return '<w:' + s + ' w:val="single" w:sz="6" w:space="0" w:color="000000"/>'; }).join("") + '</w:tcBorders>';
+  var N = '<w:tcBorders>' + ["top", "left", "bottom", "right"].map(function (s) { return '<w:' + s + ' w:val="nil"/>'; }).join("") + '</w:tcBorders>';
+  function para(text, half, jc) { return '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:jc w:val="' + (jc || "center") + '"/></w:pPr>' + (text ? '<w:r><w:rPr>' + rf + '<w:sz w:val="' + half + '"/><w:szCs w:val="' + half + '"/></w:rPr><w:t xml:space="preserve">' + xe(text) + '</w:t></w:r>' : '') + '</w:p>'; }
+  function cell(w, borders, fill, inner, span) {
+    return '<w:tc><w:tcPr><w:tcW w:w="' + w + '" w:type="dxa"/>' + (span > 1 ? '<w:gridSpan w:val="' + span + '"/>' : '') + borders + (fill ? '<w:shd w:val="clear" w:color="auto" w:fill="' + fill + '"/>' : '') + '<w:vAlign w:val="center"/></w:tcPr>' + inner + '</w:tc>';
+  }
+  function row(h, cells) { return '<w:tr><w:trPr><w:cantSplit/><w:trHeight w:val="' + h + '" w:hRule="exact"/></w:trPr>' + cells + '</w:tr>'; }
+  var cols = []; for (var g = 0; g < G; g++) { if (g) cols.push(gapW); cols.push(seatW, seatW); }
+  var grid = '<w:tblGrid>' + cols.map(function (w) { return '<w:gridCol w:w="' + w + '"/>'; }).join("") + '</w:tblGrid>';
+  var rowH = Math.min(Math.round(seatW * 0.5), Math.floor((11906 - 1200 - 2600 - 500) / (maxR + 1))), rows = "";
+  function podRow() {
+    var n = cols.length, s = n % 2 ? (n - 3) / 2 + 1 : n / 2 - 1; /* 가운데 두 칸 */
+    if (G % 2) s = (G - 1) / 2 * 3;
+    var out = "";
+    for (var i = 0; i < n;) {
+      if (i === s) { out += cell(cols[i] + cols[i + 1], B, "", para("교탁", 32), 2); i += 2; }
+      else { out += cell(cols[i], N, "", para("", 20)); i++; }
+    }
+    return row(rowH, out);
+  }
+  function spacer() { return row(500, cols.map(function (w) { return cell(w, N, "", para("", 20)); }).join("")); }
+  if (!bottom) rows += podRow() + spacer();
+  for (var i = 0; i < maxR; i++) {
+    var cs = "";
+    m.groups.forEach(function (rs, g) {
+      if (g) cs += cell(gapW, N, "", para("", 20));
+      var len = rs.length, r = bottom ? (len - 1) - (i - (maxR - len)) : i, ok = bottom ? i >= maxR - len : i < len;
+      for (var c = 0; c < 2; c++) {
+        var d = ok ? rs[r][c] : { blank: true };
+        if (d.blank) { cs += cell(seatW, N, "", para("", 20)); continue; }
+        var inner = para(d.name, 36) + (d.role ? para(d.role, 22) : "");
+        cs += cell(seatW, B, d.role ? "FFF6B0" : "", inner);
+      }
+    });
+    rows += row(rowH, cs);
+  }
+  if (bottom) rows += spacer() + podRow();
+  var tbl = '<w:tbl><w:tblPr><w:tblW w:w="' + tot + '" w:type="dxa"/><w:jc w:val="center"/><w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="40" w:type="dxa"/><w:right w:w="40" w:type="dxa"/></w:tblCellMar></w:tblPr>' + grid + rows + '</w:tbl>';
+  var doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' +
+    para(m.title, 48) + para("", 64) + para("", 64) + tbl + para("", 20) +
+    '<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="600" w:right="600" w:bottom="600" w:left="600" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr></w:body></w:document>';
+  var ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>';
+  var rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
+  return { blob: zipStore([["[Content_Types].xml", ct], ["_rels/.rels", rels], ["word/document.xml", doc]]), name: m.file.replace(/\.png$/, ".docx") };
+}
+async function saveDocx() {
+  var d = null;
+  try { if (typeof claude !== "undefined") d = await claude.use("downloads"); } catch (e) {}
+  var r; try { r = sheetDocx(); } catch (e) { pmsg("워드 파일을 만들지 못했어요."); return false; }
+  if (!d) { try { browserDownload(r.blob, r.name); pmsg("워드 파일을 저장했어요. 한글에서 열어서 hwp로 저장할 수도 있어요."); return true; } catch (e) { pmsg("저장하지 못했어요."); return false; } }
+  try { await d.save({ filename: r.name, data: r.blob }); pmsg("워드 파일을 저장했어요. 한글에서 열어서 hwp로 저장할 수도 있어요."); return true; }
+  catch (e) { pmsg(e && e.code === "declined" ? "저장을 취소했어요." : "저장하지 못했어요. 다시 시도해 주세요."); return false; }
 }
 function pmsg(t) { document.getElementById("pmsg").textContent = t; }
 async function canvasBlob() {
@@ -762,7 +877,18 @@ async function loadCloudList() {
       };
       var b2 = document.createElement("button"); b2.className = "btn ghost"; b2.textContent = "삭제";
       b2.onclick = async function () { try { await DB.doc("saved/" + d.id).delete(); loadCloudList(); } catch (e) { cloudErr(e); } };
-      row.appendChild(nm); row.appendChild(b3); row.appendChild(b1); row.appendChild(b2); box.appendChild(row);
+      var b4 = document.createElement("button"); b4.className = "btn"; b4.textContent = "📄 Word 받기";
+      b4.onclick = async function () {
+        if (!v.state) return;
+        applyState(v.state);
+        document.getElementById("useNames").checked = Object.keys(nameMap()).length > 0;
+        buildSheet();
+        b4.disabled = true;
+        var ok = await saveDocx();
+        cmsg(ok ? "워드 파일을 저장했어요. 이 파일을 담임선생님께 보내 주세요." : document.getElementById("pmsg").textContent);
+        b4.disabled = false;
+      };
+      row.appendChild(nm); row.appendChild(b3); row.appendChild(b4); row.appendChild(b1); row.appendChild(b2); box.appendChild(row);
     });
   } catch (e) { cloudErr(e); }
 }
@@ -798,6 +924,7 @@ document.getElementById("bPrint").onclick = openPrint;
 document.getElementById("podPos").onchange = buildSheet;
 document.getElementById("useNames").onchange = buildSheet;
 document.getElementById("pSave").onclick = saveImage;
+document.getElementById("pDocx").onclick = saveDocx;
 ["nNames", "nGrade", "nClass", "nPres", "nVice"].forEach(function (id) { document.getElementById(id).addEventListener("input", function () { render(); save(); }); });
 document.getElementById("cSave").onclick = saveCloud;
 document.getElementById("bReset").onclick = function () { result = {}; fixed = {}; say("초기화했어요."); render(); };
