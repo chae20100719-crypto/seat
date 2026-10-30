@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>자리 바꾸기</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@300;400;600&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@300;400;600&family=IBM+Plex+Sans+KR:wght@300;400;700&display=swap">
 <style>
 /* 교실을 위에서 내려다본 모양: 칠판(초록)과 교탁(나무)이 앞, 책상은 나무색, 바닥은 타일.
    색: 칠판 초록 / 나무 갈색 / 분필 흰색 / 벽 연회색 / 포인트 학교 파랑 */
@@ -151,7 +151,7 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.sus b,body.tense .groups,.pop{animation:none}.fab,.seat{transition:none}}
 
 /* 인쇄용 자리배치도 (항상 흰 바탕, 검은 글씨) */
-#sheet{--hf:"한컴 윤체 L","Noto Serif KR","Batang","Nanum Myeongjo",serif;background:#fff;color:#000;padding:18px 12px 22px;text-align:center;border-radius:8px;font-family:var(--hf);font-weight:300}
+#sheet{--hf:"한컴 윤체 L","HaanYHeadL","IBM Plex Sans KR","Noto Sans KR",sans-serif;background:#fff;color:#000;padding:18px 12px 22px;text-align:center;border-radius:8px;font-family:var(--hf);font-weight:300}
 #sheet .st{margin:0 0 26px;font-family:var(--hf);font-weight:400;font-size:clamp(1.1rem,2.4vw,1.7rem)}
 .sg{display:flex;justify-content:center;gap:clamp(8px,1.4vw,16px);align-items:stretch}
 .sgrp{display:flex;flex-direction:column}
@@ -159,8 +159,9 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
 .srow{display:flex}
 .sc{width:clamp(60px,9.6vw,120px);height:clamp(32px,4.8vw,60px);border:1.5px solid #000;margin:-.75px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:400;font-size:clamp(.8rem,1.5vw,1.2rem);background:#fff}
 .sc.e{border-color:transparent;background:transparent}
-.sc.hl{background:#fff6b0}
-.sc .rl{font-size:.62em;font-weight:400;line-height:1.1;margin-top:2px}
+.sc.hl{background:#faf3d9}
+#sheet .sfoot{margin:18px 0 0;font-family:"Malgun Gothic","맑은 고딕","Noto Sans KR",sans-serif;font-weight:700;font-size:clamp(.62rem,1.15vw,.9rem);line-height:1.7}
+.sc .rl{font-size:.8em;font-weight:400;line-height:1.1;margin-top:1px}
 .spod{width:clamp(120px,19.2vw,240px);border:1.5px solid #000;padding:clamp(6px,1.4vw,14px) 0;font-weight:400;margin:clamp(14px,2.4vw,28px) auto 0}
 .spod.t{margin:0 auto clamp(14px,2.4vw,28px)}
 .pbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
@@ -237,6 +238,11 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
       <label>회장 번호 <input type="text" id="nPres" placeholder="예: 7" style="width:70px"></label>
       <label>부회장 번호 <input type="text" id="nVice" placeholder="예: 12" style="width:70px"></label>
     </div>
+    <label class="fl">자리표 맨 아래에 넣을 안내 문구 (한 줄에 하나, 비우면 안 나와요)
+      <textarea id="nFoot" rows="3">* 선생님의 소중한 수업 시간을 방해하는 학생이 있다면 담임에게 알려주세요.
+그에 응당하는 조치를 취하도록 하겠습니다.
+항상 저희반을 위해 애써주심에 감사드립니다.</textarea>
+    </label>
   </section>
 
   <section class="sec">
@@ -275,9 +281,10 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
     <label><input type="checkbox" id="useNames"> 번호 대신 이름으로</label>
   </div>
   <div id="sheet"></div>
-  <p class="hint noprint" id="pmsg">자리배치도를 그림 파일(PNG)이나 워드 파일(.docx)로 저장할 수 있어요.</p>
+  <p class="hint noprint" id="pmsg">자리배치도를 PDF, 그림 파일(PNG), 워드 파일(.docx)로 저장할 수 있어요.</p>
   <div class="row noprint">
     <button class="btn" id="pSave" style="font-size:1.05rem;padding:11px 22px">이미지로 저장</button>
+    <button class="btn" id="pPdf" style="font-size:1.05rem;padding:11px 22px">PDF로 저장</button>
     <button class="btn" id="pDocx" style="font-size:1.05rem;padding:11px 22px">워드 파일로 저장</button>
   </div>
 
@@ -324,7 +331,7 @@ try {
   if (se) document.getElementById("nEx").value = se;
   var sx = localStorage.getItem("seat-empty");
   if (sx) empty = JSON.parse(sx) || {};
-  ["nNames", "nGrade", "nClass", "nPres", "nVice"].forEach(function (id) { var v = localStorage.getItem("seat-" + id); if (v !== null) document.getElementById(id).value = v; });
+  ["nNames", "nGrade", "nClass", "nPres", "nVice", "nFoot"].forEach(function (id) { var v = localStorage.getItem("seat-" + id); if (v !== null) document.getElementById(id).value = v; });
   var sl = JSON.parse(localStorage.getItem("seat-layout") || "null");
   if (sl) {
     ["nCols", "frontRows"].forEach(function (id) { if (sl[id]) document.getElementById(id).value = sl[id]; });
@@ -353,7 +360,7 @@ function save() {
     localStorage.setItem("seat-to", document.getElementById("nTo").value);
     localStorage.setItem("seat-ex", document.getElementById("nEx").value);
     localStorage.setItem("seat-empty", JSON.stringify(empty));
-    ["nNames", "nGrade", "nClass", "nPres", "nVice"].forEach(function (id) { localStorage.setItem("seat-" + id, document.getElementById(id).value); });
+    ["nNames", "nGrade", "nClass", "nPres", "nVice", "nFoot"].forEach(function (id) { localStorage.setItem("seat-" + id, document.getElementById(id).value); });
     var lay = { nCols: document.getElementById("nCols").value, frontRows: document.getElementById("frontRows").value, rows: rowVals };
     localStorage.setItem("seat-layout", JSON.stringify(lay));
   } catch (e) {}
@@ -624,11 +631,12 @@ function sheetModel() {
     }
     return rs;
   });
-  return { title: "☺  " + grade + "학년  " + (cls ? cls : "○") + "반 자리배치표 ☺", groups: groups, file: grade + "학년 " + (cls || "") + "반 자리배치표.png" };
+  var foot = document.getElementById("nFoot").value.split("\n").map(function (t) { return t.trim(); }).filter(Boolean);
+  return { title: "☺  " + grade + " 학년  " + (cls ? cls : "○") + " 반 자리배치표  ☺", foot: foot, groups: groups, file: grade + "학년 " + (cls || "") + "반 자리배치표.png" };
 }
 /* 교탁이 아래일 때는 교실을 180° 돌린 모양(왼쪽↔오른쪽, 앞↔뒤 모두 반대)으로 그려요. 화면과 같은 자리예요. */
 function flip180(m) {
-  return { title: m.title, file: m.file, groups: m.groups.slice().reverse().map(function (rs) { return rs.map(function (cells) { return cells.slice().reverse(); }); }) };
+  return { title: m.title, file: m.file, foot: m.foot, groups: m.groups.slice().reverse().map(function (rs) { return rs.map(function (cells) { return cells.slice().reverse(); }); }) };
 }
 function buildSheet() {
   var m = sheetModel(), bottom = document.getElementById("podPos").value === "bottom", sh = document.getElementById("sheet");
@@ -647,7 +655,7 @@ function buildSheet() {
         var d = document.createElement("div"); d.className = "sc" + (c.blank ? " e" : "") + (c.role ? " hl" : "");
         if (!c.blank) {
           var a = document.createElement("div"); a.textContent = c.name; d.appendChild(a);
-          if (c.role) { var b = document.createElement("div"); b.className = "rl"; b.textContent = c.role; d.appendChild(b); }
+          if (c.role) { var b = document.createElement("div"); b.className = "rl"; b.textContent = "(" + c.role + ")"; d.appendChild(b); }
         }
         row.appendChild(d);
       });
@@ -657,41 +665,48 @@ function buildSheet() {
   });
   sh.appendChild(sg);
   if (bottom) sh.appendChild(pod());
+  if (m.foot && m.foot.length) { var ft = document.createElement("p"); ft.className = "sfoot"; ft.innerHTML = m.foot.map(function (l) { return xe(l); }).join("<br>"); sh.appendChild(ft); }
 }
 function sheetCanvas() {
+  /* 첨부해 준 PDF 양식(A4 가로): 칸 98x55pt, 분단 사이 21.6pt, 노란 칸 #FAF3D9, 아래 안내 문구 */
   var m = sheetModel(), bottom = document.getElementById("podPos").value === "bottom";
   if (bottom) m = flip180(m);
-  /* 샘플 한글 파일 치수(mm)를 그대로 환산: 칸 34.6x17.3, 분단 사이 7.7, 교탁 칸 2개 너비 */
-  var U = 6, cw = Math.round(34.6 * U), ch = Math.round(17.3 * U), gg = Math.round(7.7 * U), mx = 7 * U, G = m.groups.length;
+  var PW = 841.89, PH = 595.28, S = 3, G = m.groups.length, foot = m.foot || [];
   var maxR = Math.max.apply(null, m.groups.map(function (g) { return g.length; }));
-  var W = mx * 2 + G * 2 * cw + (G - 1) * gg, titleH = 40 * U, podGap = 9 * U, podH = ch, H = titleH + maxR * ch + podGap + podH + 6 * U;
-  var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
-  var pt = U * 25.4 / 72, F = '"한컴 윤체 L","Noto Serif KR","Batang","Nanum Myeongjo",serif', WT = "300 ";
-  var x = cv.getContext("2d");
-  x.fillStyle = "#fff"; x.fillRect(0, 0, W, H);
-  x.fillStyle = "#000"; x.strokeStyle = "#000"; x.lineWidth = 2; x.lineJoin = "miter"; x.textAlign = "center"; x.textBaseline = "middle";
-  x.font = WT + Math.round(22 * pt) + "px " + F; x.fillText(m.title, W / 2, 11 * U);
-  var podTop = titleH - 10 * U, gridTop = titleH;
-  if (!bottom) gridTop = podTop + podH + podGap;
-  var gridBottom = gridTop + maxR * ch;
+  var cw = 98, gg = 21.6, total = G * 2 * cw + (G - 1) * gg;
+  if (total > PW - 50) { var k = (PW - 50) / total; cw *= k; gg *= k; total = PW - 50; }
+  var podH = 50, podGap = 35, gridTop = bottom ? 103 : 153;
+  var footH = foot.length ? 29 + (foot.length - 1) * 19.5 + 10 : 0;
+  var ch = Math.min(55, (PH - 12 - gridTop - (bottom ? podGap + podH : 0) - footH) / maxR);
+  var gridBottom = gridTop + maxR * ch, left = (PW - total) / 2;
+  var F = '"한컴 윤체 L","HaanYHeadL","IBM Plex Sans KR","Noto Sans KR","Malgun Gothic",sans-serif';
+  var FB = '"Malgun Gothic","맑은 고딕","Noto Sans KR",sans-serif';
+  var cv = document.createElement("canvas"); cv.width = Math.round(PW * S); cv.height = Math.round(PH * S);
+  var x = cv.getContext("2d"); x.scale(S, S);
+  x.fillStyle = "#fff"; x.fillRect(0, 0, PW, PH);
+  x.fillStyle = "#000"; x.strokeStyle = "#000"; x.lineWidth = 1.1; x.lineJoin = "miter"; x.textAlign = "center"; x.textBaseline = "middle";
+  x.font = "300 27px " + F; x.fillText(m.title, PW / 2, 43);
   m.groups.forEach(function (rs, g) {
-    var x0 = mx + g * (2 * cw + gg);
+    var x0 = left + g * (2 * cw + gg);
     rs.forEach(function (cells, r) {
       var y = bottom ? gridBottom - (r + 1) * ch : gridTop + r * ch;
       cells.forEach(function (c, ci) {
         if (c.blank) return;
         var cx = x0 + ci * cw;
-        if (c.role) { x.fillStyle = "#fff6b0"; x.fillRect(cx, y, cw, ch); x.fillStyle = "#000"; }
+        if (c.role) { x.fillStyle = "#faf3d9"; x.fillRect(cx, y, cw, ch); x.fillStyle = "#000"; }
         x.strokeRect(cx, y, cw, ch);
-        var size = Math.round(16 * pt); x.font = WT + size + "px " + F;
-        while (x.measureText(c.name).width > cw - 2 * U && size > 10) { size -= 2; x.font = WT + size + "px " + F; }
-        x.fillText(c.name, cx + cw / 2, y + (c.role ? ch / 2 - 1.6 * U : ch / 2));
-        if (c.role) { x.font = WT + Math.round(10 * pt) + "px " + F; x.fillText(c.role, cx + cw / 2, y + ch - 3.3 * U); }
+        var label = c.name.replace(". ", ".  "), size = 18; x.font = "300 " + size + "px " + F;
+        while (x.measureText(label).width > cw - 8 && size > 9) { size -= 1; x.font = "300 " + size + "px " + F; }
+        x.fillText(label, cx + cw / 2, y + (c.role ? ch / 2 - 9 : ch / 2));
+        if (c.role) { x.font = "300 15px " + F; x.fillText("(" + c.role + ")", cx + cw / 2, y + ch / 2 + 11); }
       });
     });
   });
-  var py = bottom ? gridBottom + podGap : podTop;
-  x.strokeRect(W / 2 - cw, py, 2 * cw, podH); x.font = WT + Math.round(16 * pt) + "px " + F; x.fillText("교탁", W / 2, py + podH / 2);
+  var py = bottom ? gridBottom + podGap : 75;
+  x.lineWidth = 1.1; x.strokeRect(PW / 2 - cw, py, 2 * cw, podH); x.font = "700 22px " + F; x.fillText("교탁", PW / 2, py + podH / 2);
+  var fy = (bottom ? py + podH : gridBottom) + 29;
+  x.font = "700 11.5px " + FB;
+  foot.forEach(function (ln, i) { x.fillText(ln, PW / 2, fy + i * 19.5); });
   return { cv: cv, name: m.file };
 }
 
@@ -728,19 +743,20 @@ function sheetDocx() {
   var B = '<w:tcBorders>' + ["top", "left", "bottom", "right"].map(function (s) { return '<w:' + s + ' w:val="single" w:sz="6" w:space="0" w:color="000000"/>'; }).join("") + '</w:tcBorders>';
   var N = '<w:tcBorders>' + ["top", "left", "bottom", "right"].map(function (s) { return '<w:' + s + ' w:val="nil"/>'; }).join("") + '</w:tcBorders>';
   function para(text, half, jc) { return '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:jc w:val="' + (jc || "center") + '"/></w:pPr>' + (text ? '<w:r><w:rPr>' + rf + '<w:sz w:val="' + half + '"/><w:szCs w:val="' + half + '"/></w:rPr><w:t xml:space="preserve">' + xe(text) + '</w:t></w:r>' : '') + '</w:p>'; }
+  function parab(text, half) { var FB = "맑은 고딕", rb = '<w:rFonts w:ascii="' + FB + '" w:hAnsi="' + FB + '" w:eastAsia="' + FB + '" w:cs="' + FB + '"/>'; return '<w:p><w:pPr><w:spacing w:before="0" w:after="60" w:line="240" w:lineRule="auto"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr>' + rb + '<w:b/><w:sz w:val="' + half + '"/><w:szCs w:val="' + half + '"/></w:rPr><w:t xml:space="preserve">' + xe(text) + '</w:t></w:r></w:p>'; }
   function cell(w, borders, fill, inner, span) {
     return '<w:tc><w:tcPr><w:tcW w:w="' + w + '" w:type="dxa"/>' + (span > 1 ? '<w:gridSpan w:val="' + span + '"/>' : '') + borders + (fill ? '<w:shd w:val="clear" w:color="auto" w:fill="' + fill + '"/>' : '') + '<w:vAlign w:val="center"/></w:tcPr>' + inner + '</w:tc>';
   }
   function row(h, cells) { return '<w:tr><w:trPr><w:cantSplit/><w:trHeight w:val="' + h + '" w:hRule="exact"/></w:trPr>' + cells + '</w:tr>'; }
   var cols = []; for (var g = 0; g < G; g++) { if (g) cols.push(gapW); cols.push(seatW, seatW); }
   var grid = '<w:tblGrid>' + cols.map(function (w) { return '<w:gridCol w:w="' + w + '"/>'; }).join("") + '</w:tblGrid>';
-  var rowH = Math.min(Math.round(seatW * 0.5), Math.floor((11906 - 1200 - 2600 - 500) / (maxR + 1))), rows = "";
+  var rowH = Math.min(Math.round(seatW * 0.5), Math.floor((11906 - 1200 - 2600 - 500 - 1100) / (maxR + 1))), rows = "";
   function podRow() {
     var n = cols.length, s = n % 2 ? (n - 3) / 2 + 1 : n / 2 - 1; /* 가운데 두 칸 */
     if (G % 2) s = (G - 1) / 2 * 3;
     var out = "";
     for (var i = 0; i < n;) {
-      if (i === s) { out += cell(cols[i] + cols[i + 1], B, "", para("교탁", 32), 2); i += 2; }
+      if (i === s) { out += cell(cols[i] + cols[i + 1], B, "", para("교탁", 44), 2); i += 2; }
       else { out += cell(cols[i], N, "", para("", 20)); i++; }
     }
     return row(rowH, out);
@@ -755,8 +771,8 @@ function sheetDocx() {
       for (var c = 0; c < 2; c++) {
         var d = ok ? rs[r][c] : { blank: true };
         if (d.blank) { cs += cell(seatW, N, "", para("", 20)); continue; }
-        var inner = para(d.name, 36) + (d.role ? para(d.role, 22) : "");
-        cs += cell(seatW, B, d.role ? "FFF6B0" : "", inner);
+        var inner = para(d.name, 36) + (d.role ? para("(" + d.role + ")", 30) : "");
+        cs += cell(seatW, B, d.role ? "FAF3D9" : "", inner);
       }
     });
     rows += row(rowH, cs);
@@ -764,7 +780,7 @@ function sheetDocx() {
   if (bottom) rows += spacer() + podRow();
   var tbl = '<w:tbl><w:tblPr><w:tblW w:w="' + tot + '" w:type="dxa"/><w:jc w:val="center"/><w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="40" w:type="dxa"/><w:right w:w="40" w:type="dxa"/></w:tblCellMar></w:tblPr>' + grid + rows + '</w:tbl>';
   var doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' +
-    para(m.title, 48) + para("", 64) + para("", 64) + tbl + para("", 20) +
+    para(m.title, 54) + para("", 64) + para("", 64) + tbl + para("", 48) + (m.foot || []).map(function (l) { return parab(l, 23); }).join("") +
     '<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="600" w:right="600" w:bottom="600" w:left="600" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr></w:body></w:document>';
   var ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>';
   var rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
@@ -778,9 +794,53 @@ async function saveDocx() {
   try { await d.save({ filename: r.name, data: r.blob }); pmsg("워드 파일을 저장했어요. 한글에서 열어서 hwp로 저장할 수도 있어요."); return true; }
   catch (e) { pmsg(e && e.code === "declined" ? "저장을 취소했어요." : "저장하지 못했어요. 다시 시도해 주세요."); return false; }
 }
+/* ---- PDF 파일로 저장: 그림을 A4 가로 PDF 한 장에 넣어요 ---- */
+async function loadSheetFonts() {
+  /* 칸에 실제로 들어갈 글자를 모두 알려 줘서, 필요한 글꼴 조각을 빠짐없이 먼저 불러와요 */
+  var t = "가나다☺0123456789.()교탁 ";
+  try { var m = sheetModel(); t += m.title + (m.foot || []).join("") + m.groups.map(function (g) { return g.map(function (r) { return r.map(function (c) { return (c.name || "") + (c.role || ""); }).join(""); }).join(""); }).join(""); } catch (e) {}
+  try {
+    await Promise.all([
+      document.fonts.load('300 20px "IBM Plex Sans KR"', t), document.fonts.load('400 20px "IBM Plex Sans KR"', t), document.fonts.load('700 20px "IBM Plex Sans KR"', t),
+      document.fonts.load('700 20px "Noto Sans KR"', t)
+    ]);
+    await document.fonts.ready;
+  } catch (e) {}
+}
+function makePdf(jpeg, w, h) {
+  var enc = new TextEncoder(), parts = [], off = 0, offs = [];
+  function add(x) { var b = typeof x === "string" ? enc.encode(x) : x; parts.push(b); off += b.length; }
+  var PWt = "841.89", PHt = "595.28", content = "q " + PWt + " 0 0 " + PHt + " 0 0 cm /Im0 Do Q";
+  add("%PDF-1.4\n");
+  offs[1] = off; add("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+  offs[2] = off; add("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");
+  offs[3] = off; add("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + PWt + " " + PHt + "] /Resources << /XObject << /Im0 5 0 R >> >> /Contents 4 0 R >>\nendobj\n");
+  offs[4] = off; add("4 0 obj\n<< /Length " + content.length + " >>\nstream\n" + content + "\nendstream\nendobj\n");
+  offs[5] = off; add("5 0 obj\n<< /Type /XObject /Subtype /Image /Width " + w + " /Height " + h + " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + jpeg.length + " >>\nstream\n");
+  add(jpeg); add("\nendstream\nendobj\n");
+  var xr = off, t = "xref\n0 6\n0000000000 65535 f \n";
+  for (var i = 1; i <= 5; i++) t += ("0000000000" + offs[i]).slice(-10) + " 00000 n \n";
+  add(t + "trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xr + "\n%%EOF\n");
+  return new Blob(parts, { type: "application/pdf" });
+}
+async function sheetPdf() {
+  await loadSheetFonts();
+  var c = sheetCanvas();
+  var jb = await new Promise(function (res) { c.cv.toBlob(res, "image/jpeg", 0.93); });
+  var bytes = new Uint8Array(await jb.arrayBuffer());
+  return { blob: makePdf(bytes, c.cv.width, c.cv.height), name: c.name.replace(/\.png$/, ".pdf") };
+}
+async function savePdf() {
+  var d = null;
+  try { if (typeof claude !== "undefined") d = await claude.use("downloads"); } catch (e) {}
+  var r; try { r = await sheetPdf(); } catch (e) { pmsg("PDF를 만들지 못했어요."); return false; }
+  if (!d) { try { browserDownload(r.blob, r.name); pmsg("PDF 파일을 저장했어요."); return true; } catch (e) { pmsg("저장하지 못했어요."); return false; } }
+  try { await d.save({ filename: r.name, data: r.blob }); pmsg("PDF 파일을 저장했어요."); return true; }
+  catch (e) { pmsg(e && e.code === "declined" ? "저장을 취소했어요." : "저장하지 못했어요. 다시 시도해 주세요."); return false; }
+}
 function pmsg(t) { document.getElementById("pmsg").textContent = t; }
 async function canvasBlob() {
-  try { await Promise.all([document.fonts.load('300 40px "Noto Serif KR"', "가나다☺"), document.fonts.load('400 40px "Noto Serif KR"', "가")]); } catch (e) {}
+  await loadSheetFonts();
   var c = sheetCanvas();
   return new Promise(function (res) { c.cv.toBlob(function (b) { res({ blob: b, name: c.name }); }, "image/png"); });
 }
@@ -800,7 +860,7 @@ function openPrint() {
 
 
 /* ---- 내 계정에 저장 · 불러오기 (db) ---- */
-var DB = null, STATE_IDS = ["nCols", "frontRows", "nFrom", "nTo", "nEx", "nNames", "nGrade", "nClass", "nPres", "nVice"];
+var DB = null, STATE_IDS = ["nCols", "frontRows", "nFrom", "nTo", "nEx", "nNames", "nGrade", "nClass", "nPres", "nVice", "nFoot"];
 var FIREBASE_CONFIG = {
   /* ▼ Firebase 콘솔에서 복사한 값을 따옴표 안에 붙여 넣으세요 ▼ */
   apiKey: "AIzaSyB1d9ndZ345yny2I_khptdWs2oLdej0eGM",
@@ -888,7 +948,18 @@ async function loadCloudList() {
         cmsg(ok ? "워드 파일을 저장했어요. 이 파일을 담임선생님께 보내 주세요." : document.getElementById("pmsg").textContent);
         b4.disabled = false;
       };
-      row.appendChild(nm); row.appendChild(b3); row.appendChild(b4); row.appendChild(b1); row.appendChild(b2); box.appendChild(row);
+      var b5 = document.createElement("button"); b5.className = "btn"; b5.textContent = "📕 PDF 받기";
+      b5.onclick = async function () {
+        if (!v.state) return;
+        applyState(v.state);
+        document.getElementById("useNames").checked = Object.keys(nameMap()).length > 0;
+        buildSheet();
+        b5.disabled = true;
+        var ok = await savePdf();
+        cmsg(ok ? "PDF 파일을 저장했어요. 이 파일을 담임선생님께 보내 주세요." : document.getElementById("pmsg").textContent);
+        b5.disabled = false;
+      };
+      row.appendChild(nm); row.appendChild(b3); row.appendChild(b4); row.appendChild(b5); row.appendChild(b1); row.appendChild(b2); box.appendChild(row);
     });
   } catch (e) { cloudErr(e); }
 }
@@ -925,7 +996,8 @@ document.getElementById("podPos").onchange = buildSheet;
 document.getElementById("useNames").onchange = buildSheet;
 document.getElementById("pSave").onclick = saveImage;
 document.getElementById("pDocx").onclick = saveDocx;
-["nNames", "nGrade", "nClass", "nPres", "nVice"].forEach(function (id) { document.getElementById(id).addEventListener("input", function () { render(); save(); }); });
+document.getElementById("pPdf").onclick = savePdf;
+["nNames", "nGrade", "nClass", "nPres", "nVice", "nFoot"].forEach(function (id) { document.getElementById(id).addEventListener("input", function () { render(); save(); }); });
 document.getElementById("cSave").onclick = saveCloud;
 document.getElementById("bReset").onclick = function () { result = {}; fixed = {}; say("초기화했어요."); render(); };
 ["nFrom", "nTo", "nEx"].forEach(function (id) { document.getElementById(id).addEventListener("change", function () { result = {}; fixed = {}; save(); render(); }); });
