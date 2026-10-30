@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>자리 바꾸기</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@300;400;600&family=IBM+Plex+Sans+KR:wght@300;400;700&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@300;400;600&display=swap">
 <style>
 /* 교실을 위에서 내려다본 모양: 칠판(초록)과 교탁(나무)이 앞, 책상은 나무색, 바닥은 타일.
    색: 칠판 초록 / 나무 갈색 / 분필 흰색 / 벽 연회색 / 포인트 학교 파랑 */
@@ -151,7 +151,7 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.sus b,body.tense .groups,.pop{animation:none}.fab,.seat{transition:none}}
 
 /* 인쇄용 자리배치도 (항상 흰 바탕, 검은 글씨) */
-#sheet{--hf:"한컴 윤체 L","HaanYHeadL","IBM Plex Sans KR","Noto Sans KR",sans-serif;background:#fff;color:#000;padding:18px 12px 22px;text-align:center;border-radius:8px;font-family:var(--hf);font-weight:300}
+#sheet{--hf:"Noto Sans KR","Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",sans-serif;background:#fff;color:#000;padding:18px 12px 22px;text-align:center;border-radius:8px;font-family:var(--hf);font-weight:400}
 #sheet .st{margin:0 0 26px;font-family:var(--hf);font-weight:400;font-size:clamp(1.1rem,2.4vw,1.7rem)}
 .sg{display:flex;justify-content:center;gap:clamp(8px,1.4vw,16px);align-items:stretch}
 .sgrp{display:flex;flex-direction:column}
@@ -283,6 +283,7 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
   <div id="sheet"></div>
   <p class="hint noprint" id="pmsg">자리배치도를 PDF, 그림 파일(PNG), 워드 파일(.docx)로 저장할 수 있어요.</p>
   <div class="row noprint">
+    <button class="btn ghost" id="pPrev" style="font-size:1.05rem;padding:11px 22px">파일 미리보기</button>
     <button class="btn" id="pSave" style="font-size:1.05rem;padding:11px 22px">이미지로 저장</button>
     <button class="btn" id="pPdf" style="font-size:1.05rem;padding:11px 22px">PDF로 저장</button>
     <button class="btn" id="pDocx" style="font-size:1.05rem;padding:11px 22px">워드 파일로 저장</button>
@@ -317,6 +318,12 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
 
 <div class="sus" id="sus" hidden><div class="track"><div class="bar" id="susBar"></div></div></div>
 
+<div class="ov" id="ovPrev" hidden style="z-index:12"><div class="modal" style="max-width:min(1000px,96vw)">
+  <h3 style="margin:0 0 8px">저장될 파일 미리보기</h3>
+  <p class="hint" style="margin:0 0 8px">PDF·이미지로 저장하면 이렇게 나와요. (워드 파일은 글꼴이 조금 다를 수 있어요)</p>
+  <img id="prevImg" alt="저장될 자리배치표 미리보기" style="width:100%;height:auto;border:1px solid #ccc;background:#fff;display:block">
+  <div class="row" style="margin-top:10px"><button class="btn" id="prevPdf">PDF로 저장</button><button class="btn ghost" data-close>닫기</button></div>
+</div></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 var L = "ABCDEFGHIJKL";
@@ -679,13 +686,13 @@ function sheetCanvas() {
   var footH = foot.length ? 29 + (foot.length - 1) * 19.5 + 10 : 0;
   var ch = Math.min(55, (PH - 12 - gridTop - (bottom ? podGap + podH : 0) - footH) / maxR);
   var gridBottom = gridTop + maxR * ch, left = (PW - total) / 2;
-  var F = '"한컴 윤체 L","HaanYHeadL","IBM Plex Sans KR","Noto Sans KR","Malgun Gothic",sans-serif';
+  var F = '"Noto Sans KR","Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",sans-serif';
   var FB = '"Malgun Gothic","맑은 고딕","Noto Sans KR",sans-serif';
   var cv = document.createElement("canvas"); cv.width = Math.round(PW * S); cv.height = Math.round(PH * S);
   var x = cv.getContext("2d"); x.scale(S, S);
   x.fillStyle = "#fff"; x.fillRect(0, 0, PW, PH);
   x.fillStyle = "#000"; x.strokeStyle = "#000"; x.lineWidth = 1.1; x.lineJoin = "miter"; x.textAlign = "center"; x.textBaseline = "middle";
-  x.font = "300 27px " + F; x.fillText(m.title, PW / 2, 43);
+  x.font = "400 27px " + F; x.fillText(m.title, PW / 2, 43);
   m.groups.forEach(function (rs, g) {
     var x0 = left + g * (2 * cw + gg);
     rs.forEach(function (cells, r) {
@@ -695,15 +702,15 @@ function sheetCanvas() {
         var cx = x0 + ci * cw;
         if (c.role) { x.fillStyle = "#faf3d9"; x.fillRect(cx, y, cw, ch); x.fillStyle = "#000"; }
         x.strokeRect(cx, y, cw, ch);
-        var label = c.name.replace(". ", ".  "), size = 18; x.font = "300 " + size + "px " + F;
-        while (x.measureText(label).width > cw - 8 && size > 9) { size -= 1; x.font = "300 " + size + "px " + F; }
+        var label = c.name.replace(". ", ".  "), size = 18; x.font = "400 " + size + "px " + F;
+        while (x.measureText(label).width > cw - 8 && size > 9) { size -= 1; x.font = "400 " + size + "px " + F; }
         x.fillText(label, cx + cw / 2, y + (c.role ? ch / 2 - 9 : ch / 2));
-        if (c.role) { x.font = "300 15px " + F; x.fillText("(" + c.role + ")", cx + cw / 2, y + ch / 2 + 11); }
+        if (c.role) { x.font = "400 15px " + F; x.fillText("(" + c.role + ")", cx + cw / 2, y + ch / 2 + 11); }
       });
     });
   });
   var py = bottom ? gridBottom + podGap : 75;
-  x.lineWidth = 1.1; x.strokeRect(PW / 2 - cw, py, 2 * cw, podH); x.font = "700 22px " + F; x.fillText("교탁", PW / 2, py + podH / 2);
+  x.lineWidth = 1.1; x.strokeRect(PW / 2 - cw, py, 2 * cw, podH); x.font = "400 22px " + F; x.fillText("교탁", PW / 2, py + podH / 2);
   var fy = (bottom ? py + podH : gridBottom) + 29;
   x.font = "700 11.5px " + FB;
   foot.forEach(function (ln, i) { x.fillText(ln, PW / 2, fy + i * 19.5); });
@@ -739,7 +746,7 @@ function sheetDocx() {
   var G = m.groups.length, maxR = Math.max.apply(null, m.groups.map(function (g) { return g.length; }));
   var avail = 15600, gapW = Math.round(avail * 0.03), seatW = Math.floor((avail - (G - 1) * gapW) / (2 * G)), tot = G * 2 * seatW + (G - 1) * gapW;
   if (tot > avail) { var k = avail / tot; seatW = Math.floor(seatW * k); gapW = Math.floor(gapW * k); tot = G * 2 * seatW + (G - 1) * gapW; }
-  var FONT = "한컴 윤체 L", rf = '<w:rFonts w:ascii="' + FONT + '" w:hAnsi="' + FONT + '" w:eastAsia="' + FONT + '" w:cs="' + FONT + '"/>';
+  var FONT = "맑은 고딕", rf = '<w:rFonts w:ascii="' + FONT + '" w:hAnsi="' + FONT + '" w:eastAsia="' + FONT + '" w:cs="' + FONT + '"/>';
   var B = '<w:tcBorders>' + ["top", "left", "bottom", "right"].map(function (s) { return '<w:' + s + ' w:val="single" w:sz="6" w:space="0" w:color="000000"/>'; }).join("") + '</w:tcBorders>';
   var N = '<w:tcBorders>' + ["top", "left", "bottom", "right"].map(function (s) { return '<w:' + s + ' w:val="nil"/>'; }).join("") + '</w:tcBorders>';
   function para(text, half, jc) { return '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:jc w:val="' + (jc || "center") + '"/></w:pPr>' + (text ? '<w:r><w:rPr>' + rf + '<w:sz w:val="' + half + '"/><w:szCs w:val="' + half + '"/></w:rPr><w:t xml:space="preserve">' + xe(text) + '</w:t></w:r>' : '') + '</w:p>'; }
@@ -801,7 +808,7 @@ async function loadSheetFonts() {
   try { var m = sheetModel(); t += m.title + (m.foot || []).join("") + m.groups.map(function (g) { return g.map(function (r) { return r.map(function (c) { return (c.name || "") + (c.role || ""); }).join(""); }).join(""); }).join(""); } catch (e) {}
   try {
     await Promise.all([
-      document.fonts.load('300 20px "IBM Plex Sans KR"', t), document.fonts.load('400 20px "IBM Plex Sans KR"', t), document.fonts.load('700 20px "IBM Plex Sans KR"', t),
+      document.fonts.load('400 20px "Noto Sans KR"', t),
       document.fonts.load('700 20px "Noto Sans KR"', t)
     ]);
     await document.fonts.ready;
@@ -959,7 +966,7 @@ async function loadCloudList() {
         cmsg(ok ? "PDF 파일을 저장했어요. 이 파일을 담임선생님께 보내 주세요." : document.getElementById("pmsg").textContent);
         b5.disabled = false;
       };
-      row.appendChild(nm); row.appendChild(b3); row.appendChild(b4); row.appendChild(b5); row.appendChild(b1); row.appendChild(b2); box.appendChild(row);
+      row.appendChild(nm); row.appendChild(b1); row.appendChild(b2); box.appendChild(row);
     });
   } catch (e) { cloudErr(e); }
 }
@@ -997,6 +1004,14 @@ document.getElementById("useNames").onchange = buildSheet;
 document.getElementById("pSave").onclick = saveImage;
 document.getElementById("pDocx").onclick = saveDocx;
 document.getElementById("pPdf").onclick = savePdf;
+document.getElementById("pPrev").onclick = async function () {
+  var b = this; b.disabled = true;
+  try { await loadSheetFonts(); document.getElementById("prevImg").src = sheetCanvas().cv.toDataURL("image/jpeg", 0.9); openOv("ovPrev"); }
+  catch (e) { pmsg("미리보기를 만들지 못했어요."); }
+  b.disabled = false;
+};
+document.getElementById("prevPdf").onclick = savePdf;
+
 ["nNames", "nGrade", "nClass", "nPres", "nVice", "nFoot"].forEach(function (id) { document.getElementById(id).addEventListener("input", function () { render(); save(); }); });
 document.getElementById("cSave").onclick = saveCloud;
 document.getElementById("bReset").onclick = function () { result = {}; fixed = {}; say("초기화했어요."); render(); };
