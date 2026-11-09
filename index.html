@@ -1267,13 +1267,13 @@ document.getElementById("rosterFile").addEventListener("change", function () {
 document.getElementById("rosterCls").addEventListener("change", function () { rosterCls = this.value; if (Object.keys(rosterByCls).length) showClassRoster(); });
 document.getElementById("rosterSample").onclick = function () {
   function s(r, t) { return '<c r="' + r + '" t="inlineStr"><is><t>' + xe(t) + '</t></is></c>'; }
-  var data = [["번호", "이름", "비고"], ["1", "김철수", "회장"], ["2", "김영희", "전출"], ["3", "이민수", "부회장"], ["4", "박다인", ""]], rowsX = "";
-  data.forEach(function (d, i) { var n = i + 1; rowsX += '<row r="' + n + '">' + (i === 0 ? s("A1", d[0]) + s("B1", d[1]) + s("C1", d[2]) : '<c r="A' + n + '"><v>' + d[0] + '</v></c>' + s("B" + n, d[1]) + (d[2] ? s("C" + n, d[2]) : "")) + '</row>'; });
+  var data = [["번호", "이름", "비고", "예시 파일이에요. 아래 줄을 지우고 우리 반 명렬표를 적어 주세요."], ["1", "김철수", "회장", "← 비고에 회장·부회장을 쓰면 자동으로 입력돼요."], ["2", "김영희", "전출", "← 비고에 전출·자퇴를 쓰면 자리바꾸기에서 빠져요."], ["3", "이민수", "부회장", ""], ["4", "홍길동", "", ""]], rowsX = "";
+  data.forEach(function (d, i) { var n = i + 1; rowsX += '<row r="' + n + '">' + (i === 0 ? s("A1", d[0]) : '<c r="A' + n + '"><v>' + d[0] + '</v></c>') + s("B" + n, d[1]) + (d[2] ? s("C" + n, d[2]) : "") + (d[3] ? s("E" + n, d[3]) : "") + '</row>'; });
   var H = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
   var files = [
     ["[Content_Types].xml", H + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'],
     ["_rels/.rels", H + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
-    ["xl/workbook.xml", H + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="명렬표" sheetId="1" r:id="rId1"/></sheets></workbook>'],
+    ["xl/workbook.xml", H + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="예시" sheetId="1" r:id="rId1"/></sheets></workbook>'],
     ["xl/_rels/workbook.xml.rels", H + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'],
     ["xl/worksheets/sheet1.xml", H + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>' + rowsX + '</sheetData></worksheet>']
   ];
