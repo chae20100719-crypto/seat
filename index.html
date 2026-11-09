@@ -202,6 +202,7 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
 <div class="ov" id="ovNums" hidden><div class="modal">
   <h2>학급 정보 입력</h2>
 
+  <button class="btn ghost" id="bRoster" style="margin-bottom:10px">명렬표로 다시 만들기</button>
   <section class="sec">
     <h3>학생 번호</h3>
     <div class="row">
@@ -227,7 +228,7 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
   <section class="sec">
     <h3>이름 · 회장 · 부회장</h3>
     <div class="row">
-      <label><input type="number" id="nGrade" value="1" min="1" max="6" style="width:56px"> 학년</label>
+      <label><input type="number" id="nGrade" value="" placeholder="1" min="1" max="6" style="width:56px"> 학년</label>
       <label><input type="text" id="nClass" placeholder="예: 3" style="width:70px"> 반</label>
     </div>
     <label class="fl">학생 이름 (한 줄에 한 명)
@@ -239,9 +240,7 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
       <label>부회장 번호 <input type="text" id="nVice" placeholder="예: 12" style="width:70px"></label>
     </div>
     <label class="fl">자리표 맨 아래에 넣을 안내 문구 (한 줄에 하나, 비우면 안 나와요)
-      <textarea id="nFoot" rows="3">* 선생님의 소중한 수업 시간을 방해하는 학생이 있다면 담임에게 알려주세요.
-그에 응당하는 조치를 취하도록 하겠습니다.
-항상 저희반을 위해 애써주심에 감사드립니다.</textarea>
+      <textarea id="nFoot" rows="3" placeholder="예: 수업을 방해하는 학생이 있다면 담임에게 알려주세요."></textarea>
     </label>
   </section>
 
@@ -325,6 +324,15 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
   <div class="row" style="margin-top:10px"><button class="btn" id="prevPdf">PDF로 저장</button><button class="btn ghost" data-close>닫기</button></div>
 </div></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<div class="ov" id="ovStart" hidden style="z-index:11"><div class="modal">
+  <h2>우리 반 시작하기</h2>
+  <p class="hint" style="margin-top:0">명렬표를 아래에 붙여 넣으면 학생 수, 번호, 이름, 자리 칸 수가 한 번에 만들어져요. 한글·엑셀 표를 복사해서 붙여 넣어도 돼요.</p>
+  <label class="fl">명렬표 (한 줄에 한 명)
+    <textarea id="rosterIn" rows="10" placeholder="1 김철수&#10;2 김영희&#10;3 이민수&#10;...&#10;(번호 없이 이름만 적어도 돼요)"></textarea>
+  </label>
+  <p class="hint" id="rosterMsg"></p>
+  <div class="row"><button class="btn" id="rosterGo">우리 반 만들기</button><button class="btn ghost" id="rosterSkip">나중에 하기</button></div>
+</div></div>
 <script>
 var L = "ABCDEFGHIJKL";
 var msgEl = document.getElementById("msg");
@@ -1040,6 +1048,54 @@ document.getElementById("nCols").addEventListener("change", function () {
 document.getElementById("frontRows").addEventListener("change", resetLayout);
 buildRowInputs();
 render();
+
+/* ---- 명렬표로 우리 반 만들기 ---- */
+function parseRoster(text) {
+  var skip = { "번호": 1, "이름": 1, "성명": 1, "성별": 1, "남": 1, "여": 1, "비고": 1 }, rows = [], used = {}, last = 0;
+  text.split(/\r?\n/).forEach(function (line) {
+    var toks = line.split(/[\s,.]+/).filter(Boolean), n = null, name = null;
+    for (var i = 0; i < toks.length; i++) {
+      var t = toks[i];
+      if (/^\d{1,3}$/.test(t)) { if (n === null && name === null) n = parseInt(t, 10); }
+      else if (!skip[t] && /^[가-힣A-Za-z][가-힣A-Za-z·]*$/.test(t)) { if (name === null) name = t; }
+    }
+    if (!name) return;
+    if (n === null || used[n]) n = last + 1;
+    while (used[n]) n++;
+    used[n] = 1; last = n; rows.push({ n: n, name: name });
+  });
+  return rows;
+}
+function layoutFor(count) {
+  var cols = count > 60 ? 8 : 6, G = cols / 2, R = Math.ceil(count / 2), b = Math.floor(R / G), rem = R - b * G, v = [], i;
+  for (i = 0; i < G; i++) v.push(b);
+  var order = []; for (i = 0; i < G; i += 2) order.push(i); for (i = 1; i < G; i += 2) order.push(i);
+  for (i = 0; i < rem; i++) v[order[i % G]]++;
+  return { cols: cols, rows: v.map(function (x) { return Math.min(10, Math.max(1, x)); }) };
+}
+function applyRoster() {
+  var rows = parseRoster(document.getElementById("rosterIn").value), msg = document.getElementById("rosterMsg");
+  if (rows.length < 2) { msg.textContent = "이름을 찾지 못했어요. 한 줄에 한 명씩 적어 주세요."; return; }
+  rows.sort(function (a, b) { return a.n - b.n; });
+  var from = rows[0].n, to = rows[rows.length - 1].n, have = {}, miss = [];
+  rows.forEach(function (r) { have[r.n] = 1; });
+  for (var i = from; i <= to; i++) if (!have[i]) miss.push(i);
+  var lay = layoutFor(rows.length);
+  document.getElementById("nFrom").value = from; document.getElementById("nTo").value = to;
+  document.getElementById("nEx").value = miss.join(", ");
+  document.getElementById("nNames").value = rows.map(function (r) { return r.n + " " + r.name; }).join("\n");
+  document.getElementById("nPres").value = ""; document.getElementById("nVice").value = "";
+  document.getElementById("nCols").value = lay.cols; rowVals = lay.rows.slice();
+  result = {}; fixed = {}; empty = {};
+  buildRowInputs(); save(); render();
+  document.getElementById("ovStart").hidden = true;
+  say("우리 반 학생 " + rows.length + "명을 불러왔어요. 학년·반·회장·부회장을 확인해 주세요.");
+  openOv("ovNums");
+}
+document.getElementById("rosterGo").onclick = applyRoster;
+document.getElementById("rosterSkip").onclick = function () { document.getElementById("ovStart").hidden = true; };
+document.getElementById("bRoster").onclick = function () { document.getElementById("ovNums").hidden = true; document.getElementById("rosterIn").value = document.getElementById("nNames").value; openOv("ovStart"); };
+try { if (localStorage.getItem("seat-to") === null && !document.getElementById("nNames").value.trim()) openOv("ovStart"); } catch (e) { }
 </script>
 </body>
 </html>
