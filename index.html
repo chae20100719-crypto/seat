@@ -340,7 +340,21 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
 <div class="ov" id="ovStart" hidden style="z-index:11"><div class="modal">
   <h2>우리 반 시작하기</h2>
   <p class="hint" style="margin-top:0">명렬표를 아래에 붙여 넣으면 학생 수, 번호, 이름, 자리 칸 수가 한 번에 만들어져요. 한글·엑셀 표를 복사해서 붙여 넣어도 돼요.</p>
-  <label class="fl">명렬표 (한 줄에 한 명)
+  <div class="sec" style="margin-bottom:10px">
+    <h3 style="margin:0 0 6px">엑셀 파일로 올리기</h3>
+    <p class="hint" style="margin:0 0 6px">엑셀 첫 줄에 <b>반 · 번호 · 이름</b> 제목을 쓰고, 그 아래로 한 줄에 한 명씩 적어요. (.xlsx 또는 .csv 파일이에요)</p>
+    <table style="border-collapse:collapse;font-size:.9rem;margin:0 0 8px"><tbody>
+      <tr><td style="border:1px solid #999;padding:3px 12px"><b>반</b></td><td style="border:1px solid #999;padding:3px 12px"><b>번호</b></td><td style="border:1px solid #999;padding:3px 12px"><b>이름</b></td></tr>
+      <tr><td style="border:1px solid #999;padding:3px 12px">4</td><td style="border:1px solid #999;padding:3px 12px">1</td><td style="border:1px solid #999;padding:3px 12px">김철수</td></tr>
+      <tr><td style="border:1px solid #999;padding:3px 12px">4</td><td style="border:1px solid #999;padding:3px 12px">2</td><td style="border:1px solid #999;padding:3px 12px">김영희</td></tr>
+    </tbody></table>
+    <div class="row"><input type="file" id="rosterFile" accept=".xlsx,.csv" style="max-width:100%"><button class="btn ghost" id="rosterSample" type="button">양식 파일 받기</button></div>
+    <label class="fl" id="rosterClsBox" hidden>여러 반이 들어 있어요. 어느 반으로 할까요?
+      <select id="rosterCls"></select>
+    </label>
+    <p class="hint" id="fileMsg"></p>
+  </div>
+  <label class="fl">또는 직접 붙여 넣기 (한 줄에 한 명)
     <textarea id="rosterIn" rows="10" placeholder="1 김철수&#10;2 김영희&#10;3 이민수&#10;...&#10;(번호 없이 이름만 적어도 돼요)"></textarea>
   </label>
   <p class="hint" id="rosterMsg"></p>
@@ -1077,7 +1091,7 @@ function parseRoster(text) {
       if (/^\d{1,3}$/.test(t)) { if (n === null && name === null) n = parseInt(t, 10); }
       else if (!skip[t] && /^[가-힣A-Za-z][가-힣A-Za-z·]*$/.test(t)) { if (name === null) name = t; }
     }
-    if (!name) return;
+    if (!name || GONE.test(line)) return;
     if (n === null || used[n]) n = last + 1;
     while (used[n]) n++;
     used[n] = 1; last = n; rows.push({ n: n, name: name });
@@ -1103,6 +1117,7 @@ function applyRoster() {
   document.getElementById("nEx").value = miss.join(", ");
   document.getElementById("nNames").value = rows.map(function (r) { return r.n + " " + r.name; }).join("\n");
   document.getElementById("nPres").value = ""; document.getElementById("nVice").value = "";
+  if (rosterCls) document.getElementById("nClass").value = rosterCls;
   document.getElementById("nCols").value = lay.cols; rowVals = lay.rows.slice();
   result = {}; fixed = {}; empty = {};
   buildRowInputs(); save(); render();
@@ -1114,6 +1129,130 @@ document.getElementById("rosterGo").onclick = applyRoster;
 document.getElementById("rosterSkip").onclick = function () { document.getElementById("ovStart").hidden = true; };
 document.getElementById("bRoster").onclick = function () { document.getElementById("ovNums").hidden = true; document.getElementById("rosterIn").value = document.getElementById("nNames").value; openOv("ovStart"); };
 try { if (store().getItem("seat-to") === null && !document.getElementById("nNames").value.trim()) openOv("ovStart"); } catch (e) { }
+
+
+/* ---- 엑셀 명렬표 올리기 (따로 설치할 것 없이 브라우저 안에서 읽어요) ---- */
+var rosterCls = "", rosterByCls = {};
+var GONE = /전출|전학|자퇴|퇴학|제외|결번|유학|이민/;
+function cellStr(v) { return v === undefined || v === null ? "" : String(v).trim(); }
+async function zipRead(buf, want) {
+  var u8 = new Uint8Array(buf), dv = new DataView(buf), e = -1, i;
+  for (i = u8.length - 22; i >= 0 && i > u8.length - 70000; i--) if (dv.getUint32(i, true) === 0x06054b50) { e = i; break; }
+  if (e < 0) throw new Error("zip");
+  var cnt = dv.getUint16(e + 10, true), p = dv.getUint32(e + 16, true), out = {}, dec = new TextDecoder();
+  for (i = 0; i < cnt; i++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) break;
+    var meth = dv.getUint16(p + 10, true), cs = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), lo = dv.getUint32(p + 42, true);
+    var name = dec.decode(u8.subarray(p + 46, p + 46 + nl));
+    p += 46 + nl + el + cl;
+    if (!want(name)) continue;
+    var ds = lo + 30 + dv.getUint16(lo + 26, true) + dv.getUint16(lo + 28, true), raw = u8.subarray(ds, ds + cs);
+    if (meth === 0) out[name] = dec.decode(raw);
+    else if (meth === 8) out[name] = await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text();
+  }
+  return out;
+}
+function xmlDoc(t) { return new DOMParser().parseFromString(t, "application/xml"); }
+function colIdx(ref) { var m = /^([A-Z]+)/.exec(ref || ""), n = 0; if (!m) return 0; for (var i = 0; i < m[1].length; i++) n = n * 26 + m[1].charCodeAt(i) - 64; return n - 1; }
+function textOf(el) { var o = "", ts = el.getElementsByTagName("t"); for (var i = 0; i < ts.length; i++) o += ts[i].textContent; return o; }
+async function xlsxRows(buf) {
+  var f = await zipRead(buf, function (n) { return /^xl\/(workbook\.xml|_rels\/workbook\.xml\.rels|sharedStrings\.xml|worksheets\/[^\/]+\.xml)$/.test(n); });
+  var ss = [];
+  if (f["xl/sharedStrings.xml"]) { var sis = xmlDoc(f["xl/sharedStrings.xml"]).getElementsByTagName("si"); for (var i = 0; i < sis.length; i++) ss.push(textOf(sis[i])); }
+  var target = "xl/worksheets/sheet1.xml";
+  try {
+    var sh = xmlDoc(f["xl/workbook.xml"]).getElementsByTagName("sheet")[0], rid = sh.getAttribute("r:id") || sh.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id");
+    var rels = xmlDoc(f["xl/_rels/workbook.xml.rels"]).getElementsByTagName("Relationship");
+    for (var k = 0; k < rels.length; k++) if (rels[k].getAttribute("Id") === rid) { var t = rels[k].getAttribute("Target"); target = t.charAt(0) === "/" ? t.slice(1) : "xl/" + t; }
+  } catch (e) {}
+  if (!f[target]) { var ks = Object.keys(f).filter(function (n) { return n.indexOf("xl/worksheets/") === 0; }).sort(); target = ks[0]; }
+  if (!f[target]) throw new Error("sheet");
+  var rowsEl = xmlDoc(f[target]).getElementsByTagName("row"), rows = [];
+  for (var r = 0; r < rowsEl.length; r++) {
+    var cells = rowsEl[r].getElementsByTagName("c"), arr = [];
+    for (var c = 0; c < cells.length; c++) {
+      var ce = cells[c], ty = ce.getAttribute("t"), ve = ce.getElementsByTagName("v")[0], val = "";
+      if (ty === "s") val = ss[parseInt(ve ? ve.textContent : "-1", 10)] || "";
+      else if (ty === "inlineStr") val = textOf(ce);
+      else val = ve ? ve.textContent : "";
+      arr[colIdx(ce.getAttribute("r"))] = val;
+    }
+    rows[parseInt(rowsEl[r].getAttribute("r"), 10) - 1 || rows.length] = arr;
+  }
+  return Array.from(rows, function (x) { return x || []; });
+}
+function csvRows(buf) {
+  var u8 = new Uint8Array(buf), t = new TextDecoder("utf-8").decode(u8);
+  if (t.indexOf("�") >= 0) { try { t = new TextDecoder("euc-kr").decode(u8); } catch (e) {} }
+  return t.replace(/^﻿/, "").split(/\r?\n/).map(function (l) { return l.split(/[,\t]/).map(function (x) { return x.replace(/^"|"$/g, ""); }); });
+}
+function parseSheetRows(rows) {
+  var out = [], ci = -1, ni = -1, mi = -1, bi = -1, head = -1, i, j;
+  for (i = 0; i < Math.min(rows.length, 15) && head < 0; i++) {
+    var r = rows[i] || [], a = -1, b = -1, c = -1, d = -1;
+    for (j = 0; j < r.length; j++) { var t = cellStr(r[j]); if (/^(반|학급)$/.test(t)) a = j; else if (/번호/.test(t)) b = j; else if (/이름|성명/.test(t)) c = j; else if (/^(비고|메모|특이사항)$/.test(t)) d = j; }
+    if (b >= 0 && c >= 0) { head = i; ci = a; ni = b; mi = c; bi = d; }
+  }
+  for (i = head + 1; i < rows.length; i++) {
+    var row = rows[i] || [], cls = "", n, name, note = "";
+    if (head >= 0) { cls = ci >= 0 ? cellStr(row[ci]) : ""; n = cellStr(row[ni]); name = cellStr(row[mi]); note = bi >= 0 ? cellStr(row[bi]) : ""; }
+    else {
+      var c0 = cellStr(row[0]), c1 = cellStr(row[1]), c2 = cellStr(row[2]);
+      if (/^\d+$/.test(c0) && /^\d+$/.test(c1) && c2) { cls = c0; n = c1; name = c2; }
+      else if (/^\d+$/.test(c0) && c1) { n = c0; name = c1; }
+      else continue;
+    }
+    n = n.replace(/\.0+$/, "");
+    if (!/^\d{1,3}$/.test(n) || !name) continue;
+    cls = cls.replace(/\.0+$/, ""); cls = cls.replace(/[^0-9]/g, "") || cls;
+    out.push({ cls: cls, n: parseInt(n, 10), name: name.replace(/\s+/g, ""), note: note, gone: GONE.test(note) });
+  }
+  return out;
+}
+function showClassRoster(cls) {
+  var all = rosterByCls[cls] || [], list = all.filter(function (r) { return !r.gone; }), gone = all.filter(function (r) { return r.gone; });
+  rosterCls = cls;
+  document.getElementById("rosterIn").value = list.map(function (r) { return r.n + " " + r.name; }).join("\n");
+  document.getElementById("fileMsg").textContent = (cls ? cls + "반 " : "") + list.length + "명을 불러왔어요." + (gone.length ? " 비고에 전출·자퇴 등이 적힌 " + gone.length + "명은 자리에서 뺐어요 (" + gone.map(function (r) { return r.n + "번 " + r.name + " " + r.note; }).join(", ") + ")." : "") + " 아래 '우리 반 만들기'를 눌러 주세요.";
+}
+document.getElementById("rosterFile").addEventListener("change", function () {
+  var f = this.files && this.files[0], msg = document.getElementById("fileMsg");
+  if (!f) return;
+  var fr = new FileReader();
+  fr.onload = async function () {
+    try {
+      var u8 = new Uint8Array(fr.result), rows;
+      if (/\.(csv|txt)$/i.test(f.name)) rows = csvRows(fr.result);
+      else if (u8[0] === 0x50 && u8[1] === 0x4b) rows = await xlsxRows(fr.result);
+      else { msg.textContent = "이 파일 형식은 읽을 수 없어요. 엑셀에서 '다른 이름으로 저장'을 눌러 .xlsx 형식으로 저장한 뒤 올려 주세요."; return; }
+      var ents = parseSheetRows(rows);
+      if (!ents.length) { msg.textContent = "학생을 찾지 못했어요. 첫 줄에 '반, 번호, 이름' 제목이 있는지 확인해 주세요."; return; }
+      rosterByCls = {}; var order = [];
+      ents.forEach(function (e) { if (!rosterByCls[e.cls]) { rosterByCls[e.cls] = []; order.push(e.cls); } rosterByCls[e.cls].push(e); });
+      var sel = document.getElementById("rosterCls"), box = document.getElementById("rosterClsBox");
+      sel.innerHTML = "";
+      order.forEach(function (c) { var o = document.createElement("option"); o.value = c; o.textContent = (c ? c + "반" : "반 없음") + " (" + rosterByCls[c].length + "명)"; sel.appendChild(o); });
+      box.hidden = order.length < 2;
+      showClassRoster(order[0]);
+    } catch (e) { msg.textContent = "파일을 읽지 못했어요. .xlsx 파일인지 확인해 주세요."; }
+  };
+  fr.readAsArrayBuffer(f);
+});
+document.getElementById("rosterCls").addEventListener("change", function () { showClassRoster(this.value); });
+document.getElementById("rosterSample").onclick = function () {
+  function s(r, t) { return '<c r="' + r + '" t="inlineStr"><is><t>' + xe(t) + '</t></is></c>'; }
+  var data = [["반", "번호", "이름"], ["4", "1", "김철수"], ["4", "2", "김영희"], ["4", "3", "이민수"]], rowsX = "";
+  data.forEach(function (d, i) { var n = i + 1; rowsX += '<row r="' + n + '">' + (i === 0 ? s("A1", d[0]) + s("B1", d[1]) + s("C1", d[2]) : '<c r="A' + n + '"><v>' + d[0] + '</v></c><c r="B' + n + '"><v>' + d[1] + '</v></c>' + s("C" + n, d[2])) + '</row>'; });
+  var H = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  var files = [
+    ["[Content_Types].xml", H + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'],
+    ["_rels/.rels", H + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+    ["xl/workbook.xml", H + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="명렬표" sheetId="1" r:id="rId1"/></sheets></workbook>'],
+    ["xl/_rels/workbook.xml.rels", H + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'],
+    ["xl/worksheets/sheet1.xml", H + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>' + rowsX + '</sheetData></worksheet>']
+  ];
+  browserDownload(new Blob([zipStore(files)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), "명렬표 양식.xlsx");
+};
 
 /* ---- 이 기기에 저장 동의 / 초기화 ---- */
 document.getElementById(KEEP ? "keepYes" : "keepNo").checked = true;
