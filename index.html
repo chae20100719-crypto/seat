@@ -337,28 +337,37 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
   <div class="row" style="margin-top:10px"><button class="btn" id="prevPdf">PDF로 저장</button><button class="btn ghost" data-close>닫기</button></div>
 </div></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<div class="ov" id="ovStart" hidden style="z-index:11"><div class="modal">
-  <h2>우리 반 시작하기</h2>
-  <p class="hint" style="margin-top:0">명렬표를 아래에 붙여 넣으면 학생 수, 번호, 이름, 자리 칸 수가 한 번에 만들어져요. 한글·엑셀 표를 복사해서 붙여 넣어도 돼요.</p>
-  <div class="sec" style="margin-bottom:10px">
-    <h3 style="margin:0 0 6px">엑셀 파일로 올리기</h3>
-    <p class="hint" style="margin:0 0 6px">엑셀 첫 줄에 <b>반 · 번호 · 이름</b> 제목을 쓰고, 그 아래로 한 줄에 한 명씩 적어요. (.xlsx 또는 .csv 파일이에요)</p>
-    <table style="border-collapse:collapse;font-size:.9rem;margin:0 0 8px"><tbody>
-      <tr><td style="border:1px solid #999;padding:3px 12px"><b>반</b></td><td style="border:1px solid #999;padding:3px 12px"><b>번호</b></td><td style="border:1px solid #999;padding:3px 12px"><b>이름</b></td></tr>
-      <tr><td style="border:1px solid #999;padding:3px 12px">4</td><td style="border:1px solid #999;padding:3px 12px">1</td><td style="border:1px solid #999;padding:3px 12px">김철수</td></tr>
-      <tr><td style="border:1px solid #999;padding:3px 12px">4</td><td style="border:1px solid #999;padding:3px 12px">2</td><td style="border:1px solid #999;padding:3px 12px">김영희</td></tr>
-    </tbody></table>
-    <div class="row"><input type="file" id="rosterFile" accept=".xlsx,.csv" style="max-width:100%"><button class="btn ghost" id="rosterSample" type="button">양식 파일 받기</button></div>
-    <label class="fl" id="rosterClsBox" hidden>여러 반이 들어 있어요. 어느 반으로 할까요?
-      <select id="rosterCls"></select>
-    </label>
-    <p class="hint" id="fileMsg"></p>
+<div class="ov" id="ovStart" hidden style="z-index:11"><div class="modal" style="max-width:460px">
+  <h2 style="margin:0 0 2px">우리 반 시작하기</h2>
+  <p class="hint" style="margin:0 0 14px">반을 고르고 명렬표를 올리면 학생 수와 자리가 한 번에 만들어져요.</p>
+
+  <div style="display:grid;gap:16px">
+    <div>
+      <div style="font-weight:700;margin-bottom:6px">1. 몇 반인가요?</div>
+      <label class="fl" id="rosterClsBox" style="margin:0"><select id="rosterCls" style="width:100%;font-size:1rem;padding:8px"><option value="">반을 골라 주세요</option><option value="1">1반</option><option value="2">2반</option><option value="3">3반</option><option value="4">4반</option><option value="5">5반</option><option value="6">6반</option><option value="7">7반</option><option value="8">8반</option></select></label>
+    </div>
+
+    <div>
+      <div style="font-weight:700;margin-bottom:6px">2. 명렬표 엑셀 파일 올리기</div>
+      <div class="row" style="gap:8px;margin:0 0 8px">
+        <label class="btn" for="rosterFile" style="cursor:pointer;margin:0">엑셀 파일 선택</label>
+        <input type="file" id="rosterFile" accept=".xlsx,.csv" hidden>
+        <button class="btn ghost" id="rosterSample" type="button">양식 받기</button>
+      </div>
+      <p class="hint" style="margin:0 0 6px">엑셀 첫 줄에 <b>번호 · 이름 · 비고</b>를 쓰고, 한 줄에 한 명씩 적어요. 비고에 전출·자퇴가 적힌 학생은 자동으로 빠져요.</p>
+      <p class="hint" id="fileMsg" style="margin:0;font-weight:700"></p>
+    </div>
+
+    <details>
+      <summary style="cursor:pointer;font-weight:700">엑셀이 없다면 이름을 직접 붙여 넣기</summary>
+      <label class="fl" style="margin-top:8px">한 줄에 한 명 (번호 없이 이름만 적어도 돼요)
+        <textarea id="rosterIn" rows="7" placeholder="1 김철수&#10;2 김영희&#10;3 이민수"></textarea>
+      </label>
+    </details>
   </div>
-  <label class="fl">또는 직접 붙여 넣기 (한 줄에 한 명)
-    <textarea id="rosterIn" rows="10" placeholder="1 김철수&#10;2 김영희&#10;3 이민수&#10;...&#10;(번호 없이 이름만 적어도 돼요)"></textarea>
-  </label>
-  <p class="hint" id="rosterMsg"></p>
-  <div class="row"><button class="btn" id="rosterGo">우리 반 만들기</button><button class="btn ghost" id="rosterSkip">나중에 하기</button></div>
+
+  <p class="hint" id="rosterMsg" style="margin:10px 0 0"></p>
+  <div class="row" style="margin-top:14px"><button class="btn" id="rosterGo" style="flex:1;font-size:1.05rem;padding:11px 22px">우리 반 만들기</button><button class="btn ghost" id="rosterSkip">나중에 하기</button></div>
 </div></div>
 <script>
 var L = "ABCDEFGHIJKL";
@@ -1117,7 +1126,7 @@ function applyRoster() {
   document.getElementById("nEx").value = miss.join(", ");
   document.getElementById("nNames").value = rows.map(function (r) { return r.n + " " + r.name; }).join("\n");
   document.getElementById("nPres").value = ""; document.getElementById("nVice").value = "";
-  if (rosterCls) document.getElementById("nClass").value = rosterCls;
+  var rc = document.getElementById("rosterCls").value; if (rc) document.getElementById("nClass").value = rc;
   document.getElementById("nCols").value = lay.cols; rowVals = lay.rows.slice();
   result = {}; fixed = {}; empty = {};
   buildRowInputs(); save(); render();
@@ -1209,11 +1218,13 @@ function parseSheetRows(rows) {
   }
   return out;
 }
-function showClassRoster(cls) {
-  var all = rosterByCls[cls] || [], list = all.filter(function (r) { return !r.gone; }), gone = all.filter(function (r) { return r.gone; });
+function showClassRoster() {
+  var cls = document.getElementById("rosterCls").value, all = rosterByCls[cls] || rosterByCls[""] || [];
+  var list = all.filter(function (r) { return !r.gone; }), gone = all.filter(function (r) { return r.gone; }), m = document.getElementById("fileMsg");
   rosterCls = cls;
   document.getElementById("rosterIn").value = list.map(function (r) { return r.n + " " + r.name; }).join("\n");
-  document.getElementById("fileMsg").textContent = (cls ? cls + "반 " : "") + list.length + "명을 불러왔어요." + (gone.length ? " 비고에 전출·자퇴 등이 적힌 " + gone.length + "명은 자리에서 뺐어요 (" + gone.map(function (r) { return r.n + "번 " + r.name + " " + r.note; }).join(", ") + ")." : "") + " 아래 '우리 반 만들기'를 눌러 주세요.";
+  if (!all.length) { m.textContent = (cls ? cls + "반" : "고른 반") + " 학생이 파일에 없어요. 반을 다시 골라 주세요."; return; }
+  m.textContent = (cls ? cls + "반 " : "") + list.length + "명을 불러왔어요." + (gone.length ? " 비고에 전출·자퇴 등이 적힌 " + gone.length + "명은 자리에서 뺐어요 (" + gone.map(function (r) { return r.n + "번 " + r.name + " " + r.note; }).join(", ") + ")." : "") + (cls ? "" : " 위에서 몇 반인지 골라 주세요.") + " 아래 '우리 반 만들기'를 눌러 주세요.";
 }
 document.getElementById("rosterFile").addEventListener("change", function () {
   var f = this.files && this.files[0], msg = document.getElementById("fileMsg");
@@ -1226,23 +1237,21 @@ document.getElementById("rosterFile").addEventListener("change", function () {
       else if (u8[0] === 0x50 && u8[1] === 0x4b) rows = await xlsxRows(fr.result);
       else { msg.textContent = "이 파일 형식은 읽을 수 없어요. 엑셀에서 '다른 이름으로 저장'을 눌러 .xlsx 형식으로 저장한 뒤 올려 주세요."; return; }
       var ents = parseSheetRows(rows);
-      if (!ents.length) { msg.textContent = "학생을 찾지 못했어요. 첫 줄에 '반, 번호, 이름' 제목이 있는지 확인해 주세요."; return; }
+      if (!ents.length) { msg.textContent = "학생을 찾지 못했어요. 첫 줄에 '번호, 이름, 비고' 제목이 있는지 확인해 주세요."; return; }
       rosterByCls = {}; var order = [];
       ents.forEach(function (e) { if (!rosterByCls[e.cls]) { rosterByCls[e.cls] = []; order.push(e.cls); } rosterByCls[e.cls].push(e); });
-      var sel = document.getElementById("rosterCls"), box = document.getElementById("rosterClsBox");
-      sel.innerHTML = "";
-      order.forEach(function (c) { var o = document.createElement("option"); o.value = c; o.textContent = (c ? c + "반" : "반 없음") + " (" + rosterByCls[c].length + "명)"; sel.appendChild(o); });
-      box.hidden = order.length < 2;
-      showClassRoster(order[0]);
+      var sel = document.getElementById("rosterCls"), firstCls = order.filter(Boolean)[0];
+      if (firstCls) { if (![].some.call(sel.options, function (o) { return o.value === firstCls; })) { var o = document.createElement("option"); o.value = firstCls; o.textContent = firstCls + "반"; sel.appendChild(o); } sel.value = firstCls; }
+      showClassRoster();
     } catch (e) { msg.textContent = "파일을 읽지 못했어요. .xlsx 파일인지 확인해 주세요."; }
   };
   fr.readAsArrayBuffer(f);
 });
-document.getElementById("rosterCls").addEventListener("change", function () { showClassRoster(this.value); });
+document.getElementById("rosterCls").addEventListener("change", function () { rosterCls = this.value; if (Object.keys(rosterByCls).length) showClassRoster(); });
 document.getElementById("rosterSample").onclick = function () {
   function s(r, t) { return '<c r="' + r + '" t="inlineStr"><is><t>' + xe(t) + '</t></is></c>'; }
-  var data = [["반", "번호", "이름"], ["4", "1", "김철수"], ["4", "2", "김영희"], ["4", "3", "이민수"]], rowsX = "";
-  data.forEach(function (d, i) { var n = i + 1; rowsX += '<row r="' + n + '">' + (i === 0 ? s("A1", d[0]) + s("B1", d[1]) + s("C1", d[2]) : '<c r="A' + n + '"><v>' + d[0] + '</v></c><c r="B' + n + '"><v>' + d[1] + '</v></c>' + s("C" + n, d[2])) + '</row>'; });
+  var data = [["번호", "이름", "비고"], ["1", "김철수", ""], ["2", "김영희", "전출"], ["3", "이민수", ""]], rowsX = "";
+  data.forEach(function (d, i) { var n = i + 1; rowsX += '<row r="' + n + '">' + (i === 0 ? s("A1", d[0]) + s("B1", d[1]) + s("C1", d[2]) : '<c r="A' + n + '"><v>' + d[0] + '</v></c>' + s("B" + n, d[1]) + (d[2] ? s("C" + n, d[2]) : "")) + '</row>'; });
   var H = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
   var files = [
     ["[Content_Types].xml", H + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'],
