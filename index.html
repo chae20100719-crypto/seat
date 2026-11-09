@@ -200,70 +200,86 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
 </main>
 
 <div class="ov" id="ovNums" hidden><div class="modal">
+  <style>
+    #ovNums .modal{max-width:540px}
+    #ovNums .card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px}
+    #ovNums .card h3{margin:0 0 10px;font-size:1rem}
+    #ovNums .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    #ovNums .f{display:block;font-size:.85rem;color:var(--sub)}
+    #ovNums .f input,#ovNums .f select,#ovNums .f textarea{display:block;width:100%;box-sizing:border-box;margin-top:3px;font-size:1rem;color:var(--text)}
+    #ovNums .f textarea{height:120px}
+    #ovNums #rowInputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:10px;margin:10px 0 0}
+    #ovNums #rowInputs label{display:block;font-size:.85rem;color:var(--sub)}
+    #ovNums #rowInputs input{display:block;width:100%;box-sizing:border-box;margin-top:3px;font-size:1rem}
+    #ovNums .opt{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
+    #ovNums .opt input{margin-top:4px}
+    #ovNums .hint{margin:8px 0 0}
+    #ovNums .done{position:sticky;bottom:-4px;background:var(--card);padding:8px 0 2px}
+  </style>
   <h2>학급 정보 입력</h2>
+  <p class="hint" id="cnt" style="margin:0 0 12px;font-weight:700"></p>
 
-  <button class="btn ghost" id="bRoster" style="margin-bottom:10px">명렬표로 다시 만들기</button>
-  <section class="sec">
-    <h3>이 기기에 저장</h3>
-    <p style="margin:0 0 6px"><b>이 기기에 정보를 계속 유지할까요?</b></p>
-    <div class="row">
-      <label><input type="radio" name="keep" id="keepYes" value="1"> 동의 (이 기기에서 다시 켤 때마다 입력한 정보가 나와요)</label>
+  <div class="card">
+    <h3>우리 반</h3>
+    <div class="g2">
+      <label class="f">학년 <input type="number" id="nGrade" value="" placeholder="예: 1" min="1" max="6"></label>
+      <label class="f">반 <input type="text" id="nClass" placeholder="예: 4" autocomplete="off"></label>
     </div>
-    <div class="row">
-      <label><input type="radio" name="keep" id="keepNo" value="0" checked> 비동의 (사이트를 나가면 입력한 정보가 사라져요)</label>
+    <div class="g2" style="margin-top:10px">
+      <label class="f">회장 번호 <input type="text" id="nPres" placeholder="예: 7" autocomplete="off"></label>
+      <label class="f">부회장 번호 <input type="text" id="nVice" placeholder="예: 12" autocomplete="off"></label>
     </div>
-    <p class="hint" id="keepMsg"></p>
-    <button class="btn ghost" id="bWipe">학급 정보 모두 지우기 (초기화)</button>
-  </section>
+    <button class="btn ghost" id="bRoster" style="margin-top:12px;width:100%">명렬표로 다시 만들기</button>
+  </div>
 
-  <section class="sec">
-    <h3>학생 번호</h3>
-    <div class="row">
-      <label><input type="number" id="nFrom" value="1" min="1" max="999"> 번부터</label>
-      <label><input type="number" id="nTo" value="27" min="1" max="999"> 번까지</label>
+  <div class="card">
+    <h3>학생</h3>
+    <div class="g2">
+      <label class="f">시작 번호 <input type="number" id="nFrom" value="1" min="1" max="999"></label>
+      <label class="f">끝 번호 <input type="number" id="nTo" value="27" min="1" max="999"></label>
     </div>
-    <label class="fl">없는 번호 (전출·자퇴 등)
+    <label class="f" style="margin-top:10px">없는 번호 (전출·자퇴 등)
       <input type="text" id="nEx" placeholder="예: 5, 13" autocomplete="off">
     </label>
     <p class="hint">없는 번호는 쉼표나 띄어쓰기로 구분해요. 자리 배정에서 빠져요.</p>
-  </section>
-
-  <section class="sec">
-    <h3>자리 모양</h3>
-    <div class="row">
-      <label>줄 수 <input type="number" id="nCols" value="6" min="2" max="12" step="2"></label>
-      <label>앞자리 칸 수 <input type="number" id="frontRows" value="2" min="0" max="10"></label>
-    </div>
-    <div class="row" id="rowInputs"></div>
-    <p class="hint">줄은 A, B, C… 세로줄이고 2줄이 한 분단이에요. 칸 수는 분단마다 정해요. 앞자리 칸 수만큼은 노란색 앞자리예요.</p>
-  </section>
-
-  <section class="sec">
-    <h3>이름 · 회장 · 부회장</h3>
-    <div class="row">
-      <label><input type="number" id="nGrade" value="" placeholder="1" min="1" max="6" style="width:56px"> 학년</label>
-      <label><input type="text" id="nClass" placeholder="예: 3" style="width:70px"> 반</label>
-    </div>
-    <label class="fl">학생 이름 (한 줄에 한 명)
+    <label class="f" style="margin-top:10px">학생 이름 (한 줄에 한 명, "번호 이름" 모양)
       <textarea id="nNames" placeholder="1 김철수&#10;2 김영희&#10;3 이민수&#10;..."></textarea>
     </label>
-    <p class="hint">"번호 이름" 모양으로 적어요. 번호 없이 이름만 적으면 학생 번호 순서대로 붙어요.</p>
-    <div class="row">
-      <label>회장 번호 <input type="text" id="nPres" placeholder="예: 7" style="width:70px"></label>
-      <label>부회장 번호 <input type="text" id="nVice" placeholder="예: 12" style="width:70px"></label>
+    <p class="hint">번호 없이 이름만 적으면 학생 번호 순서대로 붙어요.</p>
+  </div>
+
+  <div class="card">
+    <h3>자리 모양</h3>
+    <div class="g2">
+      <label class="f">줄 수 <input type="number" id="nCols" value="6" min="2" max="12" step="2"></label>
+      <label class="f">앞자리 칸 수 <input type="number" id="frontRows" value="2" min="0" max="10"></label>
     </div>
-    <label class="fl">자리표 맨 아래에 넣을 안내 문구 (한 줄에 하나, 비우면 안 나와요)
-      <textarea id="nFoot" rows="3" placeholder="예: 수업을 방해하는 학생이 있다면 담임에게 알려주세요."></textarea>
+    <div id="rowInputs"></div>
+    <p class="hint">줄은 A, B, C… 세로줄이고 2줄이 한 분단이에요. 칸 수는 분단마다 정해요. 앞자리 칸 수만큼은 노란색 앞자리예요.</p>
+  </div>
+
+  <div class="card">
+    <h3>자리표 안내 문구</h3>
+    <label class="f">자리표 맨 아래에 넣을 문구 (한 줄에 하나, 비우면 안 나와요)
+      <textarea id="nFoot" rows="3" style="height:80px" placeholder="예: 수업을 방해하는 학생이 있다면 담임에게 알려주세요."></textarea>
     </label>
-  </section>
+  </div>
 
-  <section class="sec">
+  <div class="card">
     <h3>효과</h3>
-    <label><input type="checkbox" id="snd" checked> 남은 자리 돌릴 때 긴장 효과음</label>
-  </section>
+    <label class="opt"><input type="checkbox" id="snd" checked> 남은 자리 돌릴 때 긴장 효과음</label>
+  </div>
 
-  <p class="hint" id="cnt"></p>
-  <button class="btn" data-close>닫기</button>
+  <div class="card">
+    <h3>이 기기에 저장</h3>
+    <div style="font-weight:700">이 기기에 정보를 계속 유지할까요?</div>
+    <label class="opt"><input type="radio" name="keep" id="keepYes" value="1"> <span><b>동의</b> · 이 기기에서 다시 켤 때마다 입력한 정보가 나와요</span></label>
+    <label class="opt"><input type="radio" name="keep" id="keepNo" value="0" checked> <span><b>비동의</b> · 사이트를 나가면 입력한 정보가 사라져요</span></label>
+    <p class="hint" id="keepMsg"></p>
+    <button class="btn ghost" id="bWipe" style="margin-top:10px;width:100%">학급 정보 모두 지우기 (초기화)</button>
+  </div>
+
+  <div class="done"><button class="btn" data-close style="width:100%;font-size:1.05rem;padding:11px">닫기</button></div>
 </div></div>
 
 <div class="ov" id="ovSeat" hidden><div class="modal">
@@ -354,7 +370,7 @@ body.tense .groups{animation:throb .55s ease-in-out infinite}
         <input type="file" id="rosterFile" accept=".xlsx,.csv" hidden>
         <button class="btn ghost" id="rosterSample" type="button">양식 받기</button>
       </div>
-      <p class="hint" style="margin:0 0 6px">엑셀 첫 줄에 <b>번호 · 이름 · 비고</b>를 쓰고, 한 줄에 한 명씩 적어요. 비고에 전출·자퇴가 적힌 학생은 자동으로 빠져요.</p>
+      <p class="hint" style="margin:0 0 6px">엑셀 첫 줄에 <b>번호 · 이름 · 비고</b>를 쓰고, 한 줄에 한 명씩 적어요. 비고에 <b>전출·자퇴</b>가 적힌 학생은 자동으로 빠지고, <b>회장·부회장</b>이 적힌 학생은 자동으로 입력돼요.</p>
       <p class="hint" id="fileMsg" style="margin:0;font-weight:700"></p>
     </div>
 
@@ -1103,7 +1119,7 @@ function parseRoster(text) {
     if (!name || GONE.test(line)) return;
     if (n === null || used[n]) n = last + 1;
     while (used[n]) n++;
-    used[n] = 1; last = n; rows.push({ n: n, name: name });
+    used[n] = 1; last = n; rows.push({ n: n, name: name, role: /부회장/.test(line) ? "부회장" : /회장/.test(line) ? "회장" : "" });
   });
   return rows;
 }
@@ -1125,13 +1141,14 @@ function applyRoster() {
   document.getElementById("nFrom").value = from; document.getElementById("nTo").value = to;
   document.getElementById("nEx").value = miss.join(", ");
   document.getElementById("nNames").value = rows.map(function (r) { return r.n + " " + r.name; }).join("\n");
-  document.getElementById("nPres").value = ""; document.getElementById("nVice").value = "";
+  var pres = rows.filter(function (r) { return r.role === "회장"; })[0], vice = rows.filter(function (r) { return r.role === "부회장"; })[0];
+  document.getElementById("nPres").value = pres ? pres.n : ""; document.getElementById("nVice").value = vice ? vice.n : "";
   var rc = document.getElementById("rosterCls").value; if (rc) document.getElementById("nClass").value = rc;
   document.getElementById("nCols").value = lay.cols; rowVals = lay.rows.slice();
   result = {}; fixed = {}; empty = {};
   buildRowInputs(); save(); render();
   document.getElementById("ovStart").hidden = true;
-  say("우리 반 학생 " + rows.length + "명을 불러왔어요. 학년·반·회장·부회장을 확인해 주세요.");
+  say("우리 반 학생 " + rows.length + "명을 불러왔어요." + (pres ? " 회장 " + pres.n + "번," : "") + (vice ? " 부회장 " + vice.n + "번이 입력됐어요." : "") + " 학년·반을 확인해 주세요.");
   openOv("ovNums");
 }
 document.getElementById("rosterGo").onclick = applyRoster;
@@ -1214,7 +1231,7 @@ function parseSheetRows(rows) {
     n = n.replace(/\.0+$/, "");
     if (!/^\d{1,3}$/.test(n) || !name) continue;
     cls = cls.replace(/\.0+$/, ""); cls = cls.replace(/[^0-9]/g, "") || cls;
-    out.push({ cls: cls, n: parseInt(n, 10), name: name.replace(/\s+/g, ""), note: note, gone: GONE.test(note) });
+    out.push({ cls: cls, n: parseInt(n, 10), name: name.replace(/\s+/g, ""), note: note, gone: GONE.test(note), role: /부회장/.test(note) ? "부회장" : /회장/.test(note) ? "회장" : "" });
   }
   return out;
 }
@@ -1222,7 +1239,7 @@ function showClassRoster() {
   var cls = document.getElementById("rosterCls").value, all = rosterByCls[cls] || rosterByCls[""] || [];
   var list = all.filter(function (r) { return !r.gone; }), gone = all.filter(function (r) { return r.gone; }), m = document.getElementById("fileMsg");
   rosterCls = cls;
-  document.getElementById("rosterIn").value = list.map(function (r) { return r.n + " " + r.name; }).join("\n");
+  document.getElementById("rosterIn").value = list.map(function (r) { return r.n + " " + r.name + (r.role ? " " + r.role : ""); }).join("\n");
   if (!all.length) { m.textContent = (cls ? cls + "반" : "고른 반") + " 학생이 파일에 없어요. 반을 다시 골라 주세요."; return; }
   m.textContent = (cls ? cls + "반 " : "") + list.length + "명을 불러왔어요." + (gone.length ? " 비고에 전출·자퇴 등이 적힌 " + gone.length + "명은 자리에서 뺐어요 (" + gone.map(function (r) { return r.n + "번 " + r.name + " " + r.note; }).join(", ") + ")." : "") + (cls ? "" : " 위에서 몇 반인지 골라 주세요.") + " 아래 '우리 반 만들기'를 눌러 주세요.";
 }
@@ -1250,7 +1267,7 @@ document.getElementById("rosterFile").addEventListener("change", function () {
 document.getElementById("rosterCls").addEventListener("change", function () { rosterCls = this.value; if (Object.keys(rosterByCls).length) showClassRoster(); });
 document.getElementById("rosterSample").onclick = function () {
   function s(r, t) { return '<c r="' + r + '" t="inlineStr"><is><t>' + xe(t) + '</t></is></c>'; }
-  var data = [["번호", "이름", "비고"], ["1", "김철수", ""], ["2", "김영희", "전출"], ["3", "이민수", ""]], rowsX = "";
+  var data = [["번호", "이름", "비고"], ["1", "김철수", "회장"], ["2", "김영희", "전출"], ["3", "이민수", "부회장"], ["4", "박다인", ""]], rowsX = "";
   data.forEach(function (d, i) { var n = i + 1; rowsX += '<row r="' + n + '">' + (i === 0 ? s("A1", d[0]) + s("B1", d[1]) + s("C1", d[2]) : '<c r="A' + n + '"><v>' + d[0] + '</v></c>' + s("B" + n, d[1]) + (d[2] ? s("C" + n, d[2]) : "")) + '</row>'; });
   var H = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
   var files = [
